@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import ProgressBar from './ProgressBar';
+import { useAuth0 } from "@auth0/auth0-react";
+
 
 const UploadForm = () => {
   const [file, setFile] = useState(null);
@@ -18,8 +20,10 @@ const UploadForm = () => {
       setError('Please select an image file (png or jpg)');
     }
   };
+    const { isAuthenticated }  = useAuth0();
 
   return (
+    isAuthenticated && (
     <form>
       <label>
         <input type="file" onChange={handleChange} />
@@ -31,6 +35,7 @@ const UploadForm = () => {
         { file && <ProgressBar file={file} setFile={setFile} /> }
       </div>
     </form>
+    )
   );
 }
 
