@@ -10,7 +10,7 @@ import Profile from "./components/Profile";
 
 function App() {
   const [selectedImg, setSelectedImg] = useState(null);
-  console.log(Profile)
+
 
   return (
     <Router>
