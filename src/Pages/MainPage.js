@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ImageGrid from "../components/ImageGrid";
 import Title from "../components/Title";
 import UploadForm from "../components/UploadForm";
@@ -16,7 +15,7 @@ function MainPage() {
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <Router>
+   <>
       <NavBar />
       <div className="App">
         <Title />
@@ -26,7 +25,7 @@ function MainPage() {
           <Modal selectedImg={selectedImg} setSelectedImg={setSelectedImg} />
         )}
       </div>
-    </Router>
+   </>
   );
 }
 

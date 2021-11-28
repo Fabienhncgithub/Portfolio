@@ -3,6 +3,9 @@ import * as FaIcons from "react-icons/fa";
 import * as AiIcons from "react-icons/ai";
 import { Link } from "react-router-dom";
 import { SidebarData } from "./SideBarData";
+import { Routes, Route } from "react-router-dom";
+import LoginButton from "./LoginButton";
+import LogoutButton from "./LogoutButton";
 
 function NavBar() {
   const [sidebar, setSidebar] = useState(false);
@@ -11,18 +14,22 @@ function NavBar() {
 
   return (
     <>
-      <div className='navbar'>
-        <Link to="#" className='menu-bars'>
+      <div className="navbar">
+        <Link to="#" className="menu-bars">
           <FaIcons.FaBars onClick={showSidebar} />
         </Link>
         <div className="title">
-      <h1>Fabien Hance</h1>
-    </div>
+          <h1>Fabien Hance</h1>
+        </div>
+        <Routes>
+          <Route path="/login" element={<LoginButton />} />
+        </Routes>
+        <LogoutButton />
       </div>
-    
-      <nav className={sidebar ? 'nav-menu active' : 'nav-menu'}>
-        <ul className='nav-menu-items'  onClick={showSidebar}>
-          <li className='navbar-toggle'>
+
+      <nav className={sidebar ? "nav-menu active" : "nav-menu"}>
+        <ul className="nav-menu-items" onClick={showSidebar}>
+          <li className="navbar-toggle">
             <Link to="#" className="menu-bars">
               <AiIcons.AiOutlineClose />
             </Link>
