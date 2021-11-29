@@ -21,6 +21,7 @@ body {
   font-size: 1.2rem;
   letter-spacing: 2px;
   font-weight: normal;
+  
 }
 .title h2,
 .title p {
@@ -179,7 +180,7 @@ min-height: 100%; */
 
 .nav-text a {
   text-decoration: none;
-  color: var(--primary);
+  color: gray;
   font-size: 18px;
   width: 95%;
   height: 100%;
@@ -190,11 +191,13 @@ min-height: 100%; */
 }
 
 .nav-text a:hover {
-  text-decoration-line: underline;
+  color: black;
 }
 
 .nav-menu-items {
-  width: 100%;
+  color: gray;
+  text-decoration: none;
+
 }
 
 .navbar-toggle {

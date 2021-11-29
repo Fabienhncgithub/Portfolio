@@ -5,8 +5,6 @@ import UploadForm from "../components/UploadForm";
 import Modal from "../components/Modal";
 
 import { useAuth0 } from "@auth0/auth0-react";
-import NavBar from "../components/NavBar";
-
 
 function MainPage() {
   const [selectedImg, setSelectedImg] = useState(null);
@@ -15,19 +13,17 @@ function MainPage() {
   if (isLoading) return <div>Loading...</div>;
 
   return (
-   <>
-      <NavBar />
+    <>
       <div className="App">
-        <Title />
+      <Title name="Portfolio"/>
         <UploadForm />
         <ImageGrid setSelectedImg={setSelectedImg} />
         {selectedImg && (
           <Modal selectedImg={selectedImg} setSelectedImg={setSelectedImg} />
         )}
       </div>
-   </>
+    </>
   );
 }
-
 
 export default MainPage;

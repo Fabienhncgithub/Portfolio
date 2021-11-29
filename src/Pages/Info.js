@@ -1,10 +1,10 @@
 import React from "react";
-import NavBar from "../components/NavBar";
+import Title from "../components/Title"
 
 function Info() {
   return (
       <>
-    <NavBar />
+           <Title name="Info"/>
       <h1>INFO</h1>
       </>
   );

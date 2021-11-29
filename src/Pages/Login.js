@@ -12,7 +12,6 @@ function Login() {
 
   return (
     <>
-      <NavBar />
         <LoginButton />
         <LogoutButton />
         <Profile />

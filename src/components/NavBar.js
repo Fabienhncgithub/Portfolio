@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import * as FaIcons from "react-icons/fa";
 import * as AiIcons from "react-icons/ai";
-import { Link } from "react-router-dom";
 import { SidebarData } from "./SideBarData";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Link, NavLink } from "react-router-dom";
 import LoginButton from "./LoginButton";
 import LogoutButton from "./LogoutButton";
 
@@ -19,7 +18,9 @@ function NavBar() {
           <FaIcons.FaBars onClick={showSidebar} />
         </Link>
         <div className="title">
-          <h1>Fabien Hance</h1>
+          <Link to="/" style={{ textDecoration: "none" }}>
+            <h1>Fabien Hance</h1>
+          </Link>
         </div>
         <Routes>
           <Route path="/login" element={<LoginButton />} />
@@ -39,6 +40,7 @@ function NavBar() {
               <li key={index} className={item.cName}>
                 <Link to={item.path}>
                   {item.icon}
+                  &nbsp; &nbsp;
                   <span>{item.title}</span>
                 </Link>
               </li>
