@@ -167,6 +167,7 @@ min-height: 100%; */
 .nav-menu.active {
   left: 0;
   transition: 350ms;
+
 }
 
 .nav-text {
@@ -197,7 +198,7 @@ min-height: 100%; */
 .nav-menu-items {
   color: gray;
   text-decoration: none;
-
+  
 }
 
 .navbar-toggle {

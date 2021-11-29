@@ -1,46 +1,26 @@
-import React, { useState } from "react";
+import React from "react";
 import Title from "../components/Title";
+import ButtonMailto from"../components/ButtonMailto";
 
 
 
-const FORM_ENDPOINT = ""; // TODO - fill on the later step
 
-const Contact = () => {
-  const [submitted, setSubmitted] = useState(false);
-  const handleSubmit = () => {
-    setSubmitted(true);
-  };
+const Contact = ({ mailto, label }) => {
 
-  if (submitted) {
-    return (
-      <>
-        <h2>Thank you!</h2>
-        <div>We'll be in touch soon.</div>
-      </>
-    );
-  }
 
   return (
-    <form
-      action="https://smartforms.dev/submit/5d54579a1b187457df9dc8f4"
+    <>
+     <div className="App">
+    <Title name="Let's talk" />
 
-      onSubmit={handleSubmit}
-      method="POST"
-      target="_blank"
-    >
-      <div>
-        <input type="text" placeholder="Your name" name="name" required />
-      </div>
-      <div>
-        <input type="email" placeholder="Email" name="email" required />
-      </div>
-      <div>
-        <textarea placeholder="Your message" name="message" required />
-      </div>
-      <div>
-        <button type="submit"> Send a message </button>
-      </div>
-    </form>
+      let's start the conversation and make something happen:
+      <span> </span>
+      
+      <ButtonMailto  label="contact@fabienhance.com" mailto="mailto:contact@fabienhance.com" />
+     
+    </div>
+   
+  </>
   );
 };
 

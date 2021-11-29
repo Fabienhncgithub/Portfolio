@@ -15,7 +15,7 @@ function MainPage() {
   return (
     <>
       <div className="App">
-      <Title name="Portfolio"/>
+        <Title name="Portfolio" />
         <UploadForm />
         <ImageGrid setSelectedImg={setSelectedImg} />
         {selectedImg && (

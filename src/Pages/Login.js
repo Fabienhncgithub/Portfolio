@@ -12,8 +12,6 @@ function Login() {
 
   return (
     <>
-        <LoginButton />
-        <LogoutButton />
         <Profile />
       </>
   );
