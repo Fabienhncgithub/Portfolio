@@ -23,6 +23,11 @@ body {
   font-weight: normal;
   
 }
+
+.title h1:hover {
+  color: gray;
+}
+
 .title h2,
 .title p {
   text-align: center;
