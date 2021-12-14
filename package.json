@@ -1,6 +1,7 @@
 {
   "name": "firegram",
   "version": "0.1.0",
+  "homepage": "https://fabienhance.com",
   "private": true,
   "dependencies": {
     "@auth0/auth0-react": "^1.8.0",

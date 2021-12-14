@@ -15,12 +15,16 @@ body {
   max-width: 960px;
   margin: 0 auto;
 }
+
 .title h1 {
   color: var(--primary);
   margin: 40px 200px 40px;
-  font-size: 1.2rem;
   letter-spacing: 2px;
   font-weight: normal;
+  position: absolute;
+  top: 8px;
+  right: 16px;
+  font-size: 18px;
   
 }
 
