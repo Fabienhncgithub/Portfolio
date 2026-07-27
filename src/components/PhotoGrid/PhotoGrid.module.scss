@@ -5,7 +5,7 @@
   width: min(60vw, 980px);
   margin-right: auto;
   margin-left: clamp(220px, 21.5vw, 420px);
-  padding: 2rem 0;
+  padding: 2.75rem 0 2rem;
   columns: 3;
   column-gap: var(--grid-gap);
 }
@@ -18,13 +18,63 @@
 
 }
 
+.mobileInstagram {
+  display: none;
+}
+
+.gridHeader {
+  position: fixed;
+  top: 0;
+  left: clamp(220px, 21.5vw, 420px);
+  z-index: 30;
+  display: grid;
+  width: min(60vw, 980px);
+  height: 2.75rem;
+  background: var(--color-paper);
+  place-items: center;
+  pointer-events: none;
+}
+
+.gridMeta {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  max-width: calc(100% - 2rem);
+  font-size: clamp(14px, 0.9vw, 17px);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 @include bp.mobile {
   .photoGrid {
     display: block;
     width: auto;
     margin-inline: var(--page-gutter);
-    padding: 6rem 0 1rem;
+    padding: 8rem 0 1rem;
     columns: 1;
+  }
+
+  .mobileInstagram {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    margin: 0.5rem auto 0;
+    place-items: center;
+
+    svg {
+      width: 29px;
+      height: 29px;
+    }
   }
 }
 
@@ -33,6 +83,74 @@
     width: auto;
     margin-inline: var(--page-gutter);
     columns: 2;
+  }
+
+  .gridHeader {
+    right: var(--page-gutter);
+    left: var(--page-gutter);
+    width: auto;
+  }
+}
+
+@media (max-width: (bp.$laptop - 1px)) {
+  .photoGrid {
+    padding-top: 8rem;
+  }
+
+  .gridHeader {
+    top: 4.75rem;
+    right: -2px;
+    left: -2px;
+    width: auto;
+    height: 2.5rem;
+    padding-inline: 2px;
+    border-bottom: 1px solid rgb(24 24 23 / 12%);
+    backface-visibility: hidden;
+    transform: translateZ(0);
+  }
+
+  .gridMeta {
+    max-width: calc(100% - (2 * var(--page-gutter)));
+    font-size: 13px;
+    letter-spacing: 0;
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+@include bp.mobile {
+  .photoGrid {
+    padding-top: 3.5rem;
+  }
+
+  .gridHeader {
+    top: 0;
+    right: -4px;
+    left: -4px;
+    z-index: 40;
+    height: 3rem;
+    padding-inline: 4px;
+    border: 0;
+    background: transparent;
+    filter: blur(3px);
+    opacity: 0;
+    visibility: visible;
+    transform: translateY(4px) translateZ(0);
+    transition:
+      opacity 450ms var(--ease-out),
+      filter 450ms var(--ease-out),
+      transform 450ms var(--ease-out);
+  }
+
+  .gridMeta {
+    font-size: 11px;
+    letter-spacing: 0.01em;
+  }
+
+  :global(html[data-mobile-gallery-header="title"]) .gridHeader {
+    filter: blur(0);
+    opacity: 1;
+    transform: translateY(0) translateZ(0);
   }
 }
 
@@ -44,6 +162,11 @@
     columns: 3;
   }
 
+  .gridHeader {
+    right: auto;
+    left: clamp(220px, 21.5vw, 420px);
+    width: min(60vw, 980px);
+  }
 }
 
 @include bp.desktop {
@@ -51,13 +174,38 @@
     width: min(62vw, 1120px);
     margin-left: clamp(250px, 20vw, 460px);
   }
+
+  .gridHeader {
+    left: clamp(250px, 20vw, 460px);
+    width: min(62vw, 1120px);
+  }
 }
 
 @include bp.wide {
   .photoGrid {
     width: min(72vw, 2800px);
     margin-inline: auto;
-    padding-top: clamp(2rem, 2.5vw, 4rem);
+    padding-top: clamp(2.75rem, 3vw, 4.5rem);
     columns: 3;
+  }
+
+  .gridHeader {
+    left: 50%;
+    width: min(72vw, 2800px);
+    height: clamp(2.75rem, 3vw, 4.5rem);
+    transform: translateX(-50%);
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .gridMeta {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+@include bp.reduced-motion {
+  .gridHeader {
+    transition: none;
   }
 }

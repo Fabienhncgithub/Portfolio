@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { InstagramLink } from "@/components/InstagramLink/InstagramLink";
 import styles from "./SiteNavigation.module.scss";
 
 export function SiteNavigation() {
@@ -18,19 +19,7 @@ export function SiteNavigation() {
           About
         </Link>
       </nav>
-      <a
-        className={styles.instagramLink}
-        aria-label="Instagram"
-        href="https://www.instagram.com/"
-        rel="noreferrer"
-        target="_blank"
-      >
-        <svg aria-hidden="true" viewBox="0 0 24 24">
-          <rect x="3" y="3" width="18" height="18" rx="5" />
-          <circle cx="12" cy="12" r="4.2" />
-          <circle cx="17.4" cy="6.7" r="1" className={styles.instagramDot} />
-        </svg>
-      </a>
+      <InstagramLink className={styles.instagramLink} />
     </header>
   );
 }

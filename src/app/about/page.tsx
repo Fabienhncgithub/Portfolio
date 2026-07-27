@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { FadeIn } from "@/components/FadeIn/FadeIn";
+import { InstagramLink } from "@/components/InstagramLink/InstagramLink";
 import styles from "./page.module.scss";
 
 export const metadata: Metadata = { title: "About" };
@@ -33,6 +34,7 @@ export default function AboutPage() {
         <div><span>CMS</span><p>Strapi</p></div>
         <div><span>Backend</span><p>.NET / REST APIs</p></div>
       </FadeIn>
+      <InstagramLink className={styles.mobileInstagram} />
     </section>
   );
 }

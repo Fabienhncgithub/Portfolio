@@ -51,14 +51,6 @@ function normalizePhoto(entry: unknown): Photo | undefined {
   };
 }
 
-function filenameTitle(filename: string) {
-  return filename
-    .replace(/\.[^.]+$/, "")
-    .replace(/[_-]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
 function normalizeMedia(entry: unknown): Photo | undefined {
   const media = record(entry);
   if (!media) return;
@@ -70,10 +62,14 @@ function normalizeMedia(entry: unknown): Photo | undefined {
   if (!url || !name || !id || !text(media?.mime)?.startsWith("image/")) return;
 
   const createdAt = text(media.createdAt);
+  const mediaTitle = text(media.title)
+    ?? text(media.alternativeText)
+    ?? text(media.caption)
+    ?? name.replace(/\.[^.]+$/, "");
 
   return {
     slug: `media-${id}`,
-    title: text(media.alternativeText) ?? filenameTitle(name),
+    title: mediaTitle,
     location: "",
     year: createdAt ? new Date(createdAt).getFullYear() : new Date().getFullYear(),
     category: "Details",

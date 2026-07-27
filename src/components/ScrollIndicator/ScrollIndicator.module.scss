@@ -1,0 +1,32 @@
+.scrollIndicator {
+  position: fixed;
+  bottom: clamp(1.25rem, 2.5vw, 2.75rem);
+  left: 50%;
+  z-index: 15;
+  display: grid;
+  grid-template-columns: auto clamp(2.5rem, 5vw, 5rem) auto;
+  gap: 0.65rem;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transform: translateX(-50%);
+  i {
+    display: block;
+    height: 1px;
+    overflow: hidden;
+    background: color-mix(in srgb, currentColor 35%, transparent);
+
+    b {
+      display: block;
+      width: 35%;
+      height: 100%;
+      background: currentColor;
+    }
+  }
+}

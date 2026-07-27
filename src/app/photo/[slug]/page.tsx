@@ -31,6 +31,13 @@ export default async function PhotoPage({
         previousHref={hasAdjacentPhotos ? `/photo/${previous.slug}` : undefined}
         nextHref={hasAdjacentPhotos ? `/photo/${next.slug}` : undefined}
       />
+      <Link
+        aria-label="Fermer la photographie et revenir à la galerie"
+        className={styles.closePhoto}
+        href="/"
+      >
+        <span aria-hidden="true" />
+      </Link>
       <PhotoEntrance
         className={styles.photo}
         style={{ "--photo-detail-ratio": `${photo.width} / ${photo.height}` } as React.CSSProperties}
@@ -44,15 +51,6 @@ export default async function PhotoPage({
         />
       </PhotoEntrance>
       <nav className={styles.pagination} aria-label="Photographies adjacentes">
-        <Link className={styles.allPhotos} href="/">
-          <svg aria-hidden="true" viewBox="0 0 16 16">
-            <circle cx="3" cy="3" r="1.25" />
-            <circle cx="13" cy="3" r="1.25" />
-            <circle cx="3" cy="13" r="1.25" />
-            <circle cx="13" cy="13" r="1.25" />
-          </svg>
-          Gallery
-        </Link>
         {hasAdjacentPhotos && (
           <span className={styles.adjacent}>
             <Link className={styles.previous} href={`/photo/${previous.slug}`}>

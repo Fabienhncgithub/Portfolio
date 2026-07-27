@@ -80,29 +80,54 @@
   }
 }
 
-.instagramDot {
-  fill: currentColor;
-  stroke: none;
-}
-
-@include bp.mobile {
+@media (max-width: (bp.$laptop - 1px)) {
   .siteNavigation {
-    position: absolute;
-    top: 1.25rem;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    width: 100%;
+    height: 4.75rem;
+    padding-inline: var(--page-gutter);
+    gap: clamp(1rem, 3.5vw, 2rem);
+    border-bottom: 1px solid rgb(24 24 23 / 12%);
+    background: var(--color-paper);
+    pointer-events: auto;
+
+    > * {
+      transition:
+        opacity 450ms var(--ease-out),
+        filter 450ms var(--ease-out),
+        transform 450ms var(--ease-out);
+    }
   }
 
   .siteNavigation nav {
     position: static;
+    margin-left: auto;
     transform: none;
+  }
+
+  .wordmark,
+  .aboutLink,
+  .instagramLink {
+    display: flex;
+    min-height: 44px;
+    align-items: center;
+  }
+
+  .aboutLink {
+    padding-inline: 0.4rem;
   }
 
   .instagramLink {
     position: static;
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    justify-content: center;
 
     svg {
       width: 29px;
@@ -113,16 +138,60 @@
 
 @include bp.phone {
   .siteNavigation {
-    top: 1rem;
-    gap: 1.25rem;
+    top: 0;
+    gap: 1rem;
   }
 
   .wordmark strong {
     font-size: 21px;
+    line-height: 0.9;
+    letter-spacing: -0.05em;
   }
 
   .aboutLink {
     font-size: 14px;
+  }
+}
+
+@include bp.mobile {
+  .siteNavigation {
+    display: flex;
+    height: 3rem;
+    gap: 0;
+    border-bottom: 0;
+  }
+
+  .siteNavigation nav {
+    margin-left: auto;
+  }
+
+  .instagramLink {
+    display: none;
+  }
+
+  :global(html[data-mobile-gallery-header="title"]) .siteNavigation > * {
+    opacity: 0;
+    pointer-events: none;
+    filter: blur(3px);
+  }
+
+  :global(html[data-mobile-gallery-header="title"]) .wordmark {
+    transform: translateX(-8px);
+  }
+
+  :global(html[data-mobile-gallery-header="title"]) .siteNavigation nav,
+  :global(html[data-mobile-gallery-header="title"]) .instagramLink {
+    transform: translateX(8px);
+  }
+}
+
+@include bp.reduced-motion {
+  .siteNavigation {
+    transition: none;
+
+    > * {
+      transition: none;
+    }
   }
 }
 
