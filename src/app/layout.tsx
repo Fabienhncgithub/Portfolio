@@ -26,13 +26,11 @@ export const metadata: Metadata = {
     siteName,
     title: "Fabien Hance — Photographer",
     description: siteDescription,
-    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Fabien Hance — Photographer",
     description: siteDescription,
-    images: ["/opengraph-image"],
   },
   robots: {
     index: true,
