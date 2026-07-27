@@ -1,15 +1,16 @@
-# Fabien Hance — Photography Portfolio
+# Photography Portfolio
 
-Portfolio photographique éditorial de Fabien Hance, conçu avec Next.js, TypeScript et Strapi.
+Portfolio photographique éditorial mobile-first conçu avec Next.js, TypeScript et Strapi.
 
-L’interface privilégie les images, la fluidité et une expérience responsive soignée : grille
-éditoriale, couleurs dominantes, navigation tactile, pages photo immersives et contenu administré
-depuis un CMS headless.
+L’interface privilégie les images, la fluidité et une expérience responsive adaptée à chaque
+format : grille éditoriale, couleurs dominantes, navigation tactile, pages photo immersives et
+contenu administré depuis un CMS headless.
 
 ## Sommaire
 
 - [Fonctionnalités](#fonctionnalités)
 - [Stack technique](#stack-technique)
+- [Responsive et breakpoints](#responsive-et-breakpoints)
 - [Démarrage rapide](#démarrage-rapide)
 - [Configuration](#configuration)
 - [Connecter Strapi](#connecter-strapi)
@@ -44,6 +45,28 @@ depuis un CMS headless.
 | [GSAP](https://gsap.com/) | Animations et transitions |
 | [Sass](https://sass-lang.com/) | Styles modulaires et responsive |
 | [pnpm](https://pnpm.io/) | Gestion des dépendances et workspace |
+
+## Responsive et breakpoints
+
+L’expérience est pensée mobile-first : navigation tactile, balayage entre les photographies,
+zones interactives adaptées au pouce et sélection de l’image située au centre de l’écran.
+L’interface évolue ensuite progressivement pour exploiter les grilles multicolonnes, le pointeur
+précis et les écrans de grande largeur.
+
+Les breakpoints sont centralisés dans `src/styles/_breakpoints.scss` :
+
+| Nom | Largeur | Usage principal |
+| --- | --- | --- |
+| `phone` | jusqu’à `426px` | Téléphones compacts |
+| `phone-wide` | de `496px` à `767px` | Téléphones larges |
+| `tablet` | de `768px` à `1023px` | Tablettes |
+| `tablet-wide` | de `820px` à `1023px` | Tablettes larges |
+| `laptop` | à partir de `1024px` | Ordinateurs portables |
+| `desktop` | à partir de `1366px` | Écrans de bureau |
+| `wide` | à partir de `1920px` | Écrans haute définition |
+| `short-screen` | hauteur maximale de `44rem` | Écrans larges de faible hauteur |
+
+Une media query dédiée à `prefers-reduced-motion` désactive les animations non essentielles.
 
 ## Démarrage rapide
 
@@ -208,7 +231,3 @@ pnpm lint
 pnpm build
 pnpm cms:build
 ```
-
----
-
-© Fabien Hance
