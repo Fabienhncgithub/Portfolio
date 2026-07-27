@@ -8,13 +8,11 @@ const handlerPath = path.join(
   "default",
   "handler.mjs",
 );
+const workerPath = path.join(process.cwd(), ".open-next", "worker.js");
 
 const marker = "/* OpenNext CommonJS bridge for managed Workers hosting. */";
 const source = await readFile(handlerPath, "utf8");
-
-if (!source.startsWith(marker)) {
-  const bridge = `${marker}
-import * as __nodeAsyncHooks from "node:async_hooks";
+const imports = `import * as __nodeAsyncHooks from "node:async_hooks";
 import * as __nodeCrypto from "node:crypto";
 import * as __nodePath from "node:path";
 import * as __nodeStream from "node:stream";
@@ -29,7 +27,11 @@ const __nodeBuiltins = new Map([
   ["node:stream/web", __nodeStreamWeb],
   ["node:zlib", __nodeZlib],
 ]);
+`;
 
+if (!source.startsWith(marker)) {
+  const bridge = `${marker}
+${imports}
 const require = (specifier) => {
   const module = __nodeBuiltins.get(specifier);
 
@@ -42,4 +44,23 @@ const require = (specifier) => {
 `;
 
   await writeFile(handlerPath, `${bridge}\n${source}`);
+}
+
+const workerSource = await readFile(workerPath, "utf8");
+
+if (!workerSource.startsWith(marker)) {
+  const workerBridge = `${marker}
+${imports}
+globalThis.require = (specifier) => {
+  const module = __nodeBuiltins.get(specifier);
+
+  if (!module) {
+    throw new Error(\`Unsupported CommonJS module: \${specifier}\`);
+  }
+
+  return module;
+};
+`;
+
+  await writeFile(workerPath, `${workerBridge}\n${workerSource}`);
 }
