@@ -197,7 +197,7 @@
   }
 }
 
-@media (hover: none), (pointer: coarse) {
+@media (any-hover: none) {
   .gridMeta {
     opacity: 1;
     visibility: visible;

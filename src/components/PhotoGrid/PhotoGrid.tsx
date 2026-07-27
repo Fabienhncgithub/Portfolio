@@ -8,6 +8,8 @@ import type { Photo } from "@/lib/photos";
 import styles from "./PhotoGrid.module.scss";
 
 const colorCache = new WeakMap<HTMLImageElement, string>();
+const precisePointerQuery = "(any-hover: hover) and (any-pointer: fine)";
+const touchOnlyQuery = "(any-hover: none), (any-pointer: coarse) and (any-hover: none)";
 
 function dominantColor(image: HTMLImageElement) {
   const cached = colorCache.get(image);
@@ -71,7 +73,7 @@ export function PhotoGrid({ photos }: { photos: Photo[] }) {
 
     if (layers) {
       const layerElements = [...layers];
-      const touchLayout = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+      const touchLayout = window.matchMedia(touchOnlyQuery).matches;
       gsap.killTweensOf(layerElements);
       gsap.to(layerElements, {
         autoAlpha: 0,
@@ -85,7 +87,7 @@ export function PhotoGrid({ photos }: { photos: Photo[] }) {
 
   function revealColorBlocks(photo: Photo) {
     const mutedLayers: Array<{ color: string; layer: Element }> = [];
-    const touchLayout = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+    const touchLayout = window.matchMedia(touchOnlyQuery).matches;
 
     grid.current?.querySelectorAll<HTMLElement>("[data-photo-slug]").forEach((tile) => {
       const layer = tile.querySelector("[data-photo-color-layer]");
@@ -124,7 +126,7 @@ export function PhotoGrid({ photos }: { photos: Photo[] }) {
   }
 
   function preview(photo: Photo) {
-    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    if (!window.matchMedia(precisePointerQuery).matches) {
       setActivePhoto(photo);
       return;
     }
@@ -147,7 +149,7 @@ export function PhotoGrid({ photos }: { photos: Photo[] }) {
   }
 
   function endPreview() {
-    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    if (!window.matchMedia(precisePointerQuery).matches) return;
     if (!activeSlug.current && !dwellTimer.current) return;
     activeSlug.current = "";
     resetColor();
@@ -235,7 +237,7 @@ export function PhotoGrid({ photos }: { photos: Photo[] }) {
   }, []);
 
   useEffect(() => {
-    const touchLayout = window.matchMedia("(hover: none), (pointer: coarse)");
+    const touchLayout = window.matchMedia(touchOnlyQuery);
     if (!touchLayout.matches) return;
 
     const photoBySlug = new Map(photos.map((photo) => [photo.slug, photo]));
