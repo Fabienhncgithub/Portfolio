@@ -12,11 +12,6 @@ export function GalleryEntrance({ children }: { children: ReactNode }) {
   const gallery = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      window.scrollTo({ top: 0 });
-      return;
-    }
-
     const root = gallery.current;
     if (!root) return;
 
@@ -26,6 +21,47 @@ export function GalleryEntrance({ children }: { children: ReactNode }) {
     const previousScrollBehavior = document.documentElement.style.scrollBehavior;
     history.scrollRestoration = "manual";
     document.documentElement.style.scrollBehavior = "auto";
+
+    const savedReturn = sessionStorage.getItem("gallery-return-state");
+    if (savedReturn) {
+      try {
+        const state = JSON.parse(savedReturn) as {
+          at: number;
+          scrollY: number;
+          slug: string;
+        };
+
+        if (
+          Date.now() - state.at < 30 * 60 * 1000
+          && Number.isFinite(state.scrollY)
+          && root.querySelector(`[data-photo-slug="${CSS.escape(state.slug)}"]`)
+        ) {
+          animationFrame = window.requestAnimationFrame(() => {
+            window.scrollTo(0, state.scrollY);
+            sessionStorage.removeItem("gallery-return-state");
+            history.scrollRestoration = previousScrollRestoration;
+            document.documentElement.style.scrollBehavior = previousScrollBehavior;
+          });
+
+          return () => {
+            window.cancelAnimationFrame(animationFrame);
+            history.scrollRestoration = previousScrollRestoration;
+            document.documentElement.style.scrollBehavior = previousScrollBehavior;
+          };
+        }
+      } catch {
+        // Ignore an invalid or outdated restoration payload.
+      }
+
+      sessionStorage.removeItem("gallery-return-state");
+    }
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      window.scrollTo({ top: 0 });
+      history.scrollRestoration = previousScrollRestoration;
+      document.documentElement.style.scrollBehavior = previousScrollBehavior;
+      return;
+    }
 
     const positionAtBottom = () => {
       const bottom = Math.max(0, root.offsetTop + root.scrollHeight - window.innerHeight);

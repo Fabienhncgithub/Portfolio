@@ -23,6 +23,9 @@ export function PhotoCursor() {
     const moveY = gsap.quickTo(element, "y", { duration: 0.22, ease: "power3.out" });
     let visible = false;
     let hideCall: gsap.core.Tween | undefined;
+    let pointerX = -1;
+    let pointerY = -1;
+    let scrollFrame = 0;
 
     function show() {
       hideCall?.kill();
@@ -51,19 +54,77 @@ export function PhotoCursor() {
       });
     }
 
-    function track(event: PointerEvent) {
-      moveX(event.clientX);
-      moveY(event.clientY);
+    function syncTarget() {
+      if (pointerX < 0 || pointerY < 0) {
+        hide();
+        return;
+      }
 
-      const target = event.target as Element | null;
+      const target = document.elementFromPoint(pointerX, pointerY);
       if (target?.closest("[data-photo-interactive]")) show();
       else hide();
     }
 
+    function track(event: PointerEvent) {
+      pointerX = event.clientX;
+      pointerY = event.clientY;
+      moveX(pointerX);
+      moveY(pointerY);
+      syncTarget();
+    }
+
+    function trackWheel(event: WheelEvent) {
+      pointerX = event.clientX;
+      pointerY = event.clientY;
+      moveX(pointerX);
+      moveY(pointerY);
+      syncAfterScroll();
+    }
+
+    function syncAfterScroll() {
+      if (scrollFrame) return;
+      scrollFrame = window.requestAnimationFrame(() => {
+        scrollFrame = window.requestAnimationFrame(() => {
+          scrollFrame = 0;
+          syncTarget();
+        });
+      });
+    }
+
+    function suspend() {
+      hide();
+    }
+
+    function leaveViewport() {
+      pointerX = -1;
+      pointerY = -1;
+      hide();
+    }
+
     window.addEventListener("pointermove", track, { passive: true });
+    window.addEventListener("pointerover", track, { passive: true });
+    window.addEventListener("pointerdown", track, { passive: true });
+    window.addEventListener("wheel", trackWheel, { passive: true });
+    window.addEventListener("scroll", syncAfterScroll, { capture: true, passive: true });
+    window.addEventListener("scrollend", syncAfterScroll, { passive: true });
+    window.addEventListener("resize", syncAfterScroll, { passive: true });
+    window.addEventListener("focus", syncAfterScroll);
+    window.addEventListener("blur", suspend);
+    document.documentElement.addEventListener("pointerleave", leaveViewport);
+
     return () => {
       hideCall?.kill();
+      window.cancelAnimationFrame(scrollFrame);
       window.removeEventListener("pointermove", track);
+      window.removeEventListener("pointerover", track);
+      window.removeEventListener("pointerdown", track);
+      window.removeEventListener("wheel", trackWheel);
+      window.removeEventListener("scroll", syncAfterScroll, true);
+      window.removeEventListener("scrollend", syncAfterScroll);
+      window.removeEventListener("resize", syncAfterScroll);
+      window.removeEventListener("focus", syncAfterScroll);
+      window.removeEventListener("blur", suspend);
+      document.documentElement.removeEventListener("pointerleave", leaveViewport);
     };
   }, [pathname]);
 

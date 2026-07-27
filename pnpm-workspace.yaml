@@ -1,4 +1,9 @@
-onlyBuiltDependencies:
-  - '@parcel/watcher'
-  - sharp
-  - unrs-resolver
+packages:
+  - '.'
+  - 'cms'
+
+allowBuilds:
+  '@parcel/watcher': true
+  better-sqlite3: true
+  sharp: true
+  unrs-resolver: true

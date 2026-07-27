@@ -41,6 +41,14 @@ export function PhotoTile({
         onBlur={onPreviewEnd}
         onClick={(event) => {
           sessionStorage.setItem(
+            "gallery-return-state",
+            JSON.stringify({
+              at: Date.now(),
+              scrollY: window.scrollY,
+              slug: photo.slug,
+            }),
+          );
+          sessionStorage.setItem(
             "photo-pointer-position",
             JSON.stringify({ x: event.clientX, y: event.clientY, at: Date.now() }),
           );
@@ -56,15 +64,12 @@ export function PhotoTile({
               fill
               ref={image}
               priority={priority}
+              data-photo-image
               sizes="(max-width: 768px) 100vw, 80vw"
               src={photo.image}
             />
             <span className={styles.colorLayer} data-photo-color-layer aria-hidden="true" />
           </div>
-          <figcaption className={styles.caption}>
-            <span>{photo.title}</span>
-            <time dateTime={String(photo.year)}>{photo.year}</time>
-          </figcaption>
         </figure>
       </Link>
     </FadeIn>
