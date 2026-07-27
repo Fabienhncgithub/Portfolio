@@ -81,6 +81,7 @@ Une media query dédiée à `prefers-reduced-motion` désactive les animations n
 git clone https://github.com/Fabienhncgithub/Portfolio.git
 cd Portfolio
 pnpm install
+pnpm --dir cms install
 pnpm dev
 ```
 
