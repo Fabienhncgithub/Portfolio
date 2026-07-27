@@ -7,7 +7,7 @@
     "cms:dev": "pnpm --dir cms develop",
     "cms:build": "pnpm --dir cms build",
     "build": "next build",
-    "build:hosting": "opennextjs-cloudflare build",
+    "build:hosting": "opennextjs-cloudflare build && node scripts/patch-open-next-worker.mjs",
     "start": "next start",
     "lint": "eslint ."
   },

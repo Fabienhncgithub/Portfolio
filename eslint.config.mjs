@@ -5,6 +5,8 @@ const config = [
   {
     ignores: [
       ".next/**",
+      ".open-next/**",
+      "dist/**",
       "cms/dist/**",
       "cms/types/generated/**",
       "next-env.d.ts",
