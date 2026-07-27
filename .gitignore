@@ -1,5 +1,6 @@
 .next
 .open-next
+.openai/
 dist
 node_modules
 .env*
