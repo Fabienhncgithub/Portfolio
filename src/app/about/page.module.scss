@@ -1,0 +1,103 @@
+@use "../../styles/breakpoints" as bp;
+
+.aboutPage {
+  width: min(100%, var(--content-width));
+  min-height: 100svh;
+  margin-inline: auto;
+  padding: 8rem var(--page-gutter) 12rem;
+
+  h1 {
+    max-width: 1100px;
+    font-size: clamp(3rem, 7vw, 8rem);
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: -0.055em;
+  }
+}
+
+.eyebrow {
+  margin-bottom: 5rem;
+  color: var(--color-muted);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.copy {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4rem;
+  width: min(70%, 900px);
+  margin: 14rem 0 14rem 25%;
+  font-size: clamp(1.15rem, 1.8vw, 1.8rem);
+  line-height: 1.25;
+}
+
+.technicalNote {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid color-mix(in srgb, var(--color-ink) 25%, transparent);
+  font-size: 11px;
+
+  span {
+    color: var(--color-muted);
+  }
+}
+
+@include bp.mobile {
+  .aboutPage {
+    padding-block: 6rem 8rem;
+    overflow-x: hidden;
+  }
+
+  .copy {
+    grid-template-columns: 1fr;
+    width: calc(100vw - (2 * var(--page-gutter)));
+    max-width: 100%;
+    margin: 7rem 0;
+    overflow-wrap: anywhere;
+
+    > *,
+    p {
+      min-width: 0;
+      max-width: 100%;
+    }
+  }
+
+  .technicalNote {
+    grid-template-columns: 1fr;
+
+    > * {
+      min-width: 0;
+      max-width: 100%;
+    }
+  }
+}
+
+@include bp.phone {
+  .aboutPage h1 {
+    width: calc(100vw - (2 * var(--page-gutter)));
+    max-width: 100%;
+    font-size: clamp(2.2rem, 10vw, 3rem);
+    overflow-wrap: anywhere;
+
+    br {
+      display: none;
+    }
+  }
+}
+
+@include bp.desktop {
+  .aboutPage {
+    padding-top: 9rem;
+  }
+}
+
+@include bp.wide {
+  .aboutPage {
+    padding-block: 10rem 15rem;
+  }
+}

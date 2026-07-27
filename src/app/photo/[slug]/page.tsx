@@ -1,7 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PhotoEntrance } from "@/components/PhotoEntrance/PhotoEntrance";
+import { PhotoKeyboardNavigation } from "@/components/PhotoKeyboardNavigation/PhotoKeyboardNavigation";
 import { getPhoto, getPhotos } from "@/lib/photos";
+import styles from "./page.module.scss";
 
 export async function generateStaticParams() {
   const photos = await getPhotos();
@@ -20,10 +23,18 @@ export default async function PhotoPage({
   const index = photos.findIndex((item) => item.slug === slug);
   const previous = photos[(index - 1 + photos.length) % photos.length];
   const next = photos[(index + 1) % photos.length];
+  const hasAdjacentPhotos = photos.length > 1;
 
   return (
-    <article className="photo-page">
-      <div className="photo-detail-image">
+    <article className={styles.photoPage} data-photo-page>
+      <PhotoKeyboardNavigation
+        previousHref={hasAdjacentPhotos ? `/photo/${previous.slug}` : undefined}
+        nextHref={hasAdjacentPhotos ? `/photo/${next.slug}` : undefined}
+      />
+      <PhotoEntrance
+        className={styles.photo}
+        style={{ "--photo-detail-ratio": `${photo.width} / ${photo.height}` } as React.CSSProperties}
+      >
         <Image
           alt={`${photo.title}, ${photo.location}`}
           fill
@@ -31,8 +42,31 @@ export default async function PhotoPage({
           sizes="100vw"
           src={photo.image}
         />
-      </div>
-      <div className="photo-meta">
+      </PhotoEntrance>
+      <nav className={styles.pagination} aria-label="Photographies adjacentes">
+        <Link className={styles.allPhotos} href="/">
+          <svg aria-hidden="true" viewBox="0 0 16 16">
+            <circle cx="3" cy="3" r="1.25" />
+            <circle cx="13" cy="3" r="1.25" />
+            <circle cx="3" cy="13" r="1.25" />
+            <circle cx="13" cy="13" r="1.25" />
+          </svg>
+          Gallery
+        </Link>
+        {hasAdjacentPhotos && (
+          <span className={styles.adjacent}>
+            <Link className={styles.previous} href={`/photo/${previous.slug}`}>
+              <span aria-hidden="true">←</span>
+              Previous
+            </Link>
+            <Link className={styles.next} href={`/photo/${next.slug}`}>
+              Next
+              <span aria-hidden="true">→</span>
+            </Link>
+          </span>
+        )}
+      </nav>
+      <div className={styles.meta}>
         <div>
           <h1>{photo.title}</h1>
           <p>{photo.location}, {photo.year}</p>
@@ -42,10 +76,6 @@ export default async function PhotoPage({
           {photo.film && <p>{photo.film}</p>}
         </div>
       </div>
-      <nav className="photo-pagination" aria-label="Photographies adjacentes">
-        <Link href={`/photo/${previous.slug}`}>← Previous</Link>
-        <Link href={`/photo/${next.slug}`}>Next →</Link>
-      </nav>
     </article>
   );
 }

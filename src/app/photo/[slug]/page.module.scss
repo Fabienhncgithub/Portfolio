@@ -1,0 +1,143 @@
+@use "../../../styles/breakpoints" as bp;
+
+.photoPage {
+  padding: 2rem var(--page-gutter) 4rem;
+}
+
+.photo {
+  position: relative;
+  width: 100%;
+  height: calc(100svh - 8rem);
+  background: #e8e6df;
+  aspect-ratio: var(--photo-detail-ratio);
+
+  img {
+    object-fit: contain;
+  }
+}
+
+.pagination,
+.meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.pagination {
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  min-height: 64px;
+  padding-block: 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 18%, transparent);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+
+}
+
+.allPhotos,
+.previous,
+.next {
+  display: inline-flex;
+  gap: 0.55rem;
+  align-items: center;
+  width: fit-content;
+
+  span {
+    color: var(--color-muted);
+    font-size: 0.9em;
+  }
+}
+
+.allPhotos {
+  min-height: 44px;
+  font-size: clamp(12px, 0.85vw, 14px);
+  letter-spacing: 0.01em;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    overflow: visible;
+    fill: currentColor;
+  }
+}
+
+.previous,
+.next {
+  min-height: 44px;
+  font-size: clamp(13px, 0.95vw, 16px);
+  letter-spacing: 0.01em;
+}
+
+.adjacent {
+  grid-column: 2;
+  display: flex;
+  justify-content: center;
+  gap: clamp(1.5rem, 4vw, 4rem);
+}
+
+.meta {
+  margin-top: 1.25rem;
+
+  h1,
+  p {
+    margin-bottom: 0.3rem;
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  > div:last-child {
+    color: var(--color-muted);
+  }
+}
+
+@include bp.mobile {
+  .photoPage {
+    padding: 1rem var(--page-gutter) 3rem;
+  }
+
+  .photo {
+    height: calc(100svh - 6rem);
+  }
+
+  .pagination {
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1rem;
+  }
+
+  .meta {
+    grid-template-columns: 1fr auto;
+
+    h1,
+    p {
+      font-size: 11px;
+    }
+  }
+
+  .adjacent {
+    justify-content: center;
+    gap: 1.25rem;
+  }
+
+  .allPhotos,
+  .previous,
+  .next {
+    min-height: 44px;
+  }
+
+  .previous,
+  .next {
+    font-size: 14px;
+  }
+}
+
+@include bp.wide {
+  .photo {
+    height: min(calc(100svh - 8rem), 1600px);
+  }
+}
+
+@include bp.short-screen {
+  .photo {
+    height: calc(100svh - 7rem);
+  }
+}

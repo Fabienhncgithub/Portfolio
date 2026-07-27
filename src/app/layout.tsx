@@ -1,24 +1,25 @@
 import type { Metadata } from "next";
-import { Header } from "@/components/Header";
-import "./globals.css";
+import { PhotoCursor } from "@/components/PhotoCursor/PhotoCursor";
+import { SiteNavigation } from "@/components/SiteNavigation/SiteNavigation";
+import "@/styles/base.scss";
 
 export const metadata: Metadata = {
   title: {
     default: "Fabien Hance — Photographer",
     template: "%s — Fabien Hance",
   },
-  description: "Photography by Fabien Hance, between Geneva and Brussels.",
+  description: "Photography by Fabien Hance.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="fr">
       <body>
-        <Header />
+        <SiteNavigation />
+        <PhotoCursor />
         <main>{children}</main>
         <footer>
           <span>© {new Date().getFullYear()} Fabien Hance</span>
-          <span>Geneva — Brussels</span>
         </footer>
       </body>
     </html>
