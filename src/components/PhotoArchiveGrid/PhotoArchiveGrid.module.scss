@@ -1,0 +1,39 @@
+@use "../../styles/breakpoints" as bp;
+
+.archiveGrid {
+  columns: 3;
+  column-gap: var(--grid-gap);
+
+  > * {
+    display: inline-block;
+    width: 100%;
+    margin-bottom: var(--grid-gap);
+    break-inside: avoid;
+  }
+}
+
+.landscape {
+  --photo-ratio: 4 / 3;
+}
+
+.portrait {
+  --photo-ratio: 3 / 4;
+}
+
+@include bp.mobile {
+  .archiveGrid {
+    columns: 1;
+  }
+}
+
+@include bp.tablet {
+  .archiveGrid {
+    columns: 2;
+  }
+}
+
+@include bp.wide {
+  .archiveGrid {
+    columns: 4;
+  }
+}

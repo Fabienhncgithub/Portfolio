@@ -1,0 +1,109 @@
+@use "breakpoints" as bp;
+
+:root {
+  --color-paper: #f7f6f2;
+  --color-ink: #181817;
+  --color-muted: #767570;
+  --content-width: 2560px;
+  --page-gutter: clamp(1.25rem, 3vw, 3.5rem);
+  --grid-gap: 20px;
+  --ease-out: cubic-bezier(0.22, 0.7, 0.2, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  color: inherit;
+  font: inherit;
+}
+
+figure,
+h1,
+p {
+  margin: 0;
+}
+
+footer {
+  width: min(100%, var(--content-width));
+  margin-inline: auto;
+  padding: 4rem var(--page-gutter) 2rem;
+  color: var(--color-muted);
+  font-size: 9px;
+}
+
+body:has([data-photo-page]) > footer {
+  display: none;
+}
+
+@include bp.mobile {
+  :root {
+    --page-gutter: clamp(1rem, 4.5vw, 1.5rem);
+    --grid-gap: 12px;
+  }
+}
+
+@include bp.phone-wide {
+  :root {
+    --page-gutter: clamp(1.25rem, 4vw, 2rem);
+  }
+}
+
+@include bp.tablet {
+  :root {
+    --page-gutter: clamp(1.5rem, 3.5vw, 2.5rem);
+    --grid-gap: 16px;
+  }
+}
+
+@include bp.tablet-wide {
+  :root {
+    --grid-gap: 18px;
+  }
+}
+
+@include bp.desktop {
+  :root {
+    --page-gutter: clamp(2.5rem, 3vw, 4.5rem);
+  }
+}
+
+@include bp.wide {
+  :root {
+    --page-gutter: clamp(3.5rem, 4vw, 7rem);
+    --grid-gap: clamp(20px, 1.25vw, 32px);
+  }
+
+  body {
+    font-size: 16px;
+  }
+}
+
+@include bp.reduced-motion {
+  html {
+    scroll-behavior: auto;
+  }
+}

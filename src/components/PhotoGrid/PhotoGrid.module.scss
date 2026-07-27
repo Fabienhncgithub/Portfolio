@@ -1,0 +1,63 @@
+@use "../../styles/breakpoints" as bp;
+
+.photoGrid {
+  min-height: 100svh;
+  width: min(60vw, 980px);
+  margin-right: auto;
+  margin-left: clamp(220px, 21.5vw, 420px);
+  padding: 2rem 0;
+  columns: 3;
+  column-gap: var(--grid-gap);
+}
+
+.item {
+  display: inline-block;
+  width: 100%;
+  margin-bottom: var(--grid-gap);
+  break-inside: avoid;
+
+}
+
+@include bp.mobile {
+  .photoGrid {
+    display: block;
+    width: auto;
+    margin-inline: var(--page-gutter);
+    padding: 6rem 0 1rem;
+    columns: 1;
+  }
+}
+
+@include bp.tablet {
+  .photoGrid {
+    width: auto;
+    margin-inline: var(--page-gutter);
+    columns: 2;
+  }
+}
+
+@include bp.laptop {
+  .photoGrid {
+    width: min(60vw, 980px);
+    margin-right: auto;
+    margin-left: clamp(220px, 21.5vw, 420px);
+    columns: 3;
+  }
+
+}
+
+@include bp.desktop {
+  .photoGrid {
+    width: min(62vw, 1120px);
+    margin-left: clamp(250px, 20vw, 460px);
+  }
+}
+
+@include bp.wide {
+  .photoGrid {
+    width: min(72vw, 2800px);
+    margin-inline: auto;
+    padding-top: clamp(2rem, 2.5vw, 4rem);
+    columns: 3;
+  }
+}

@@ -1,0 +1,35 @@
+@use "../../styles/breakpoints" as bp;
+
+.archivePage {
+  width: min(100%, var(--content-width));
+  min-height: 100svh;
+  margin-inline: auto;
+  padding: 8rem var(--page-gutter) 12rem;
+
+  > h1 {
+    margin-bottom: 5rem;
+    color: var(--color-muted);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+}
+
+@include bp.mobile {
+  .archivePage {
+    padding-block: 6rem 8rem;
+  }
+}
+
+@include bp.desktop {
+  .archivePage {
+    padding-top: 9rem;
+  }
+}
+
+@include bp.wide {
+  .archivePage {
+    padding-block: 10rem 15rem;
+  }
+}

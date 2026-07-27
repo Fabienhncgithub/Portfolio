@@ -1,37 +1,38 @@
 import type { Metadata } from "next";
-import { Reveal } from "@/components/Reveal";
+import { FadeIn } from "@/components/FadeIn/FadeIn";
+import styles from "./page.module.scss";
 
 export const metadata: Metadata = { title: "About" };
 
 export default function AboutPage() {
   return (
-    <section className="page about-page">
-      <Reveal>
-        <p className="eyebrow">About</p>
+    <section className={styles.aboutPage}>
+      <FadeIn>
+        <p className={styles.eyebrow}>About</p>
         <h1>
           I photograph quiet moments,
           <br />
           spaces and passing light.
         </h1>
-      </Reveal>
-      <div className="about-copy">
-        <Reveal>
+      </FadeIn>
+      <div className={styles.copy}>
+        <FadeIn>
           <p>
-            Based between Geneva and Brussels. My work moves through landscape,
-            architecture and the incidental details found while travelling.
+            My work moves through landscape, architecture and the incidental
+            details found while travelling.
           </p>
-        </Reveal>
-        <Reveal delay={0.1}>
+        </FadeIn>
+        <FadeIn delay={0.1}>
           <p>
             Full-stack developer working with React, Next.js, TypeScript and .NET.
           </p>
-        </Reveal>
+        </FadeIn>
       </div>
-      <Reveal className="technical-note">
+      <FadeIn className={styles.technicalNote}>
         <div><span>Frontend</span><p>Next.js / React / TypeScript</p></div>
         <div><span>CMS</span><p>Strapi</p></div>
         <div><span>Backend</span><p>.NET / REST APIs</p></div>
-      </Reveal>
+      </FadeIn>
     </section>
   );
 }

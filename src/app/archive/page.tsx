@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
-import { ArchiveGrid } from "@/components/ArchiveGrid";
+import { PhotoArchiveGrid } from "@/components/PhotoArchiveGrid/PhotoArchiveGrid";
 import { getPhotos } from "@/lib/photos";
+import styles from "./page.module.scss";
 
 export const metadata: Metadata = { title: "Archive" };
 
 export default async function ArchivePage() {
   const photos = await getPhotos();
   return (
-    <section className="page archive-page">
+    <section className={styles.archivePage}>
       <h1>Archive</h1>
-      <ArchiveGrid photos={photos} />
+      <PhotoArchiveGrid photos={photos} />
     </section>
   );
 }
