@@ -7,6 +7,7 @@
     "cms:dev": "pnpm --dir cms develop",
     "cms:build": "pnpm --dir cms build",
     "build": "next build",
+    "build:hosting": "opennextjs-cloudflare build",
     "start": "next start",
     "lint": "eslint ."
   },
@@ -19,12 +20,14 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
+    "@opennextjs/cloudflare": "^1.20.2",
     "@types/node": "^22.15.30",
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",
     "eslint": "^9.28.0",
     "eslint-config-next": "^15.5.2",
     "sass": "^1.102.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "wrangler": "^4.114.0"
   }
 }

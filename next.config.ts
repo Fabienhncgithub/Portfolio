@@ -11,7 +11,6 @@ const strapiMediaPattern = strapiUrl
   : undefined;
 
 const nextConfig: NextConfig = {
-  distDir: "dist",
   outputFileTracingRoot: process.cwd(),
   images: {
     formats: ["image/avif", "image/webp"],
