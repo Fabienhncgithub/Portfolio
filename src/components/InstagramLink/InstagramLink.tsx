@@ -3,7 +3,7 @@ export function InstagramLink({ className = "" }: { className?: string }) {
     <a
       className={className}
       aria-label="Instagram"
-      href="https://www.instagram.com/"
+      href="https://www.instagram.com/fabien_hnc/"
       rel="noreferrer"
       target="_blank"
     >
