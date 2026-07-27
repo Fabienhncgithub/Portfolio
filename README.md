@@ -194,6 +194,7 @@ L’identifiant GA4 sera fourni avec `NEXT_PUBLIC_GA_MEASUREMENT_ID`.
 | --- | --- |
 | `pnpm dev` | Démarre le frontend en développement |
 | `pnpm build` | Crée et valide le build de production |
+| `pnpm build:hosting` | Produit le bundle OpenNext destiné à l’hébergement Cloudflare |
 | `pnpm start` | Démarre le frontend compilé |
 | `pnpm lint` | Analyse le code avec ESLint |
 | `pnpm cms:dev` | Démarre Strapi en développement |
@@ -232,3 +233,6 @@ pnpm lint
 pnpm build
 pnpm cms:build
 ```
+
+Le frontend utilise l’adaptateur OpenNext officiel pour générer un Worker Cloudflare compatible
+avec les routes App Router, le rendu serveur et l’optimisation des images.
