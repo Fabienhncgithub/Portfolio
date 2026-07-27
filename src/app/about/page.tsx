@@ -3,7 +3,11 @@ import { FadeIn } from "@/components/FadeIn/FadeIn";
 import { InstagramLink } from "@/components/InstagramLink/InstagramLink";
 import styles from "./page.module.scss";
 
-export const metadata: Metadata = { title: "About" };
+export const metadata: Metadata = {
+  title: "About",
+  description: "À propos de Fabien Hance, photographe et développeur.",
+  alternates: { canonical: "/about" },
+};
 
 export default function AboutPage() {
   return (

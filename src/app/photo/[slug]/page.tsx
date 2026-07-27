@@ -1,10 +1,52 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PhotoEntrance } from "@/components/PhotoEntrance/PhotoEntrance";
 import { PhotoKeyboardNavigation } from "@/components/PhotoKeyboardNavigation/PhotoKeyboardNavigation";
 import { getPhoto, getPhotos } from "@/lib/photos";
+import { siteName } from "@/lib/site";
 import styles from "./page.module.scss";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const photo = await getPhoto(slug);
+  if (!photo) return {};
+
+  const description = [
+    photo.title,
+    photo.location,
+    photo.year ? String(photo.year) : undefined,
+    `photographie par ${siteName}`,
+  ].filter(Boolean).join(" — ");
+
+  return {
+    title: photo.title,
+    description,
+    alternates: { canonical: `/photo/${photo.slug}` },
+    openGraph: {
+      type: "article",
+      title: photo.title,
+      description,
+      images: [{
+        url: photo.image,
+        width: photo.width,
+        height: photo.height,
+        alt: `${photo.title}${photo.location ? `, ${photo.location}` : ""}`,
+      }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: photo.title,
+      description,
+      images: [photo.image],
+    },
+  };
+}
 
 export async function generateStaticParams() {
   const photos = await getPhotos();

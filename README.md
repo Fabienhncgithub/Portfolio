@@ -1,52 +1,214 @@
-# Fabien Hance — Photography portfolio
+# Fabien Hance — Photography Portfolio
 
-Portfolio photographique éditorial construit avec Next.js, TypeScript et Strapi.
+Portfolio photographique éditorial de Fabien Hance, conçu avec Next.js, TypeScript et Strapi.
 
-## Démarrer
+L’interface privilégie les images, la fluidité et une expérience responsive soignée : grille
+éditoriale, couleurs dominantes, navigation tactile, pages photo immersives et contenu administré
+depuis un CMS headless.
+
+## Sommaire
+
+- [Fonctionnalités](#fonctionnalités)
+- [Stack technique](#stack-technique)
+- [Démarrage rapide](#démarrage-rapide)
+- [Configuration](#configuration)
+- [Connecter Strapi](#connecter-strapi)
+- [Actualisation du contenu](#actualisation-du-contenu)
+- [SEO et Analytics](#seo-et-analytics)
+- [Commandes disponibles](#commandes-disponibles)
+- [Architecture du projet](#architecture-du-projet)
+- [Déploiement](#déploiement)
+
+## Fonctionnalités
+
+- Grille photographique responsive pour ordinateur, tablette et mobile.
+- Mise en avant de la photographie située au centre de l’écran.
+- Aplats générés depuis la couleur dominante de chaque image.
+- Navigation mobile par balayage vers la gauche ou la droite.
+- Retour à la position précédente dans la galerie après consultation d’une photo.
+- Navigation au clavier sur ordinateur.
+- Contenu administrable avec Strapi et contenu local de secours.
+- Images optimisées par Next.js en AVIF et WebP.
+- Métadonnées SEO, Open Graph, Twitter Cards, sitemap et robots.txt.
+- Données structurées Schema.org.
+- Respect de `prefers-reduced-motion`.
+
+## Stack technique
+
+| Technologie | Usage |
+| --- | --- |
+| [Next.js](https://nextjs.org/) | App Router, rendu, optimisation des images et SEO |
+| [React](https://react.dev/) | Interface utilisateur |
+| [TypeScript](https://www.typescriptlang.org/) | Typage statique |
+| [Strapi](https://strapi.io/) | CMS headless et médiathèque |
+| [GSAP](https://gsap.com/) | Animations et transitions |
+| [Sass](https://sass-lang.com/) | Styles modulaires et responsive |
+| [pnpm](https://pnpm.io/) | Gestion des dépendances et workspace |
+
+## Démarrage rapide
+
+### Prérequis
+
+- Node.js 20 ou plus récent.
+- pnpm 10 ou plus récent.
+
+### Installation
 
 ```bash
+git clone https://github.com/Fabienhncgithub/Portfolio.git
+cd Portfolio
 pnpm install
 pnpm dev
 ```
 
-Ouvrir `http://localhost:3000`.
+Ouvrir [http://localhost:3000](http://localhost:3000).
+
+Le frontend reste fonctionnel sans Strapi : lorsque le CMS n’est pas configuré ou indisponible,
+les photographies de `src/content/photos.ts` sont utilisées automatiquement.
+
+## Configuration
+
+Copier le fichier d’exemple :
+
+```bash
+cp .env.example .env.local
+```
+
+| Variable | Obligatoire | Description |
+| --- | --- | --- |
+| `STRAPI_URL` | Pour le CMS | URL privée utilisée par Next.js pour interroger Strapi |
+| `STRAPI_API_TOKEN` | Non | Jeton Strapi en lecture seule si l’API n’est pas publique |
+| `STRAPI_WEBHOOK_SECRET` | Non | Secret partagé utilisé par le webhook de revalidation |
+| `NEXT_PUBLIC_SITE_URL` | Production | URL canonique utilisée pour le SEO et le sitemap |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Non | Identifiant Google Analytics 4 au format `G-…` |
+
+Ne jamais placer un jeton privé Strapi dans une variable commençant par `NEXT_PUBLIC_`.
 
 ## Connecter Strapi
 
-Le site utilise automatiquement le contenu local de `src/content/photos.ts` tant que Strapi
-n'est pas disponible. Copier `.env.example` vers `.env.local`, puis renseigner `STRAPI_URL`.
+Un projet Strapi est inclus dans le dossier `cms`.
+
+```bash
+pnpm cms:dev
+```
+
+Par défaut :
+
+- le frontend est disponible sur `http://localhost:3000` ;
+- Strapi est disponible sur `http://localhost:1337`.
+
+### Collection recommandée
 
 Créer une collection `Photo` avec les champs suivants :
 
 | Champ | Type | Réglage |
 | --- | --- | --- |
-| `title` | Text | requis |
-| `slug` | UID, attaché à `title` | requis et unique |
-| `image` | Media, image unique | requis |
-| `location` | Text | |
-| `year` | Integer | |
+| `title` | Text | Requis |
+| `slug` | UID attaché à `title` | Requis et unique |
+| `image` | Media, image unique | Requis |
+| `location` | Text | Facultatif |
+| `year` | Integer | Facultatif |
 | `category` | Enumeration | `Landscape`, `City`, `Travel`, `Details` |
-| `camera` | Text | |
-| `film` | Text | |
+| `camera` | Text | Facultatif |
+| `film` | Text | Facultatif |
 
-Une image téléversée dans la Media Library n'apparaît pas seule dans le portfolio. Créer une
-entrée dans **Content Manager → Photo**, sélectionner cette image dans le champ `image`, puis
-cliquer sur **Publish**. Le portfolio affiche uniquement les entrées Photo publiées.
+Dans **Content Manager → Photo**, créer une entrée, sélectionner une image, compléter ses
+informations puis cliquer sur **Publish**.
 
-Autoriser `find` et `findOne` sur la collection, ou fournir un `STRAPI_API_TOKEN` en lecture
-seule. Les réponses Strapi 4 et 5 ainsi que les URLs de médias relatives sont normalisées dans
+Autoriser `find` et `findOne` pour la collection `Photo`, ou fournir un
+`STRAPI_API_TOKEN` disposant uniquement des droits de lecture nécessaires.
+
+### Images de la Media Library
+
+La collection `Photo` reste le mode recommandé, car elle permet de contrôler le titre, le slug,
+le lieu, l’année et les informations techniques.
+
+Les images présentes uniquement dans la Media Library sont également importées lorsqu’elles ne
+sont associées à aucune entrée `Photo`. Leur titre est déterminé dans cet ordre :
+
+1. `title` ;
+2. texte alternatif ;
+3. légende ;
+4. nom du fichier.
+
+Les réponses Strapi 4 et 5 ainsi que les URLs de médias relatives sont normalisées dans
 `src/lib/cms/strapi.ts`.
 
 ## Actualisation du contenu
 
-Les données sont mises en cache pendant 60 secondes. Pour une publication instantanée, créer
-un webhook Strapi vers `POST /api/revalidate`, ajouter l'en-tête
-`x-revalidate-secret` et utiliser la même valeur dans `STRAPI_WEBHOOK_SECRET`.
+Les données Strapi sont mises en cache pendant 60 secondes.
 
-## Organisation
+Pour déclencher une mise à jour immédiate après une publication :
 
-- `src/content` : contenu de secours local.
-- `src/lib/cms` : accès et normalisation du CMS.
-- `src/types` : contrats de contenu partagés.
-- `src/components` : composants d'interface.
-- `src/app` : routes et composition des pages.
+1. définir `STRAPI_WEBHOOK_SECRET` dans l’environnement du frontend ;
+2. créer un webhook Strapi vers `POST /api/revalidate` ;
+3. ajouter l’en-tête `x-revalidate-secret` ;
+4. utiliser la même valeur secrète des deux côtés.
+
+Une requête valide invalide le cache associé au tag `photos`.
+
+## SEO et Analytics
+
+Le projet génère automatiquement :
+
+- les métadonnées générales et celles de chaque photographie ;
+- les URL canoniques ;
+- les données Open Graph et Twitter Cards ;
+- une image de partage sociale ;
+- `/robots.txt` ;
+- `/sitemap.xml` ;
+- les données structurées `WebSite` et `Person`.
+
+Définir `NEXT_PUBLIC_SITE_URL` avec le domaine final avant le déploiement.
+
+Google Analytics n’est pas chargé tant que l’intégration et le consentement ne sont pas activés.
+L’identifiant GA4 sera fourni avec `NEXT_PUBLIC_GA_MEASUREMENT_ID`.
+
+## Commandes disponibles
+
+| Commande | Description |
+| --- | --- |
+| `pnpm dev` | Démarre le frontend en développement |
+| `pnpm build` | Crée et valide le build de production |
+| `pnpm start` | Démarre le frontend compilé |
+| `pnpm lint` | Analyse le code avec ESLint |
+| `pnpm cms:dev` | Démarre Strapi en développement |
+| `pnpm cms:build` | Compile l’administration Strapi |
+
+## Architecture du projet
+
+```text
+.
+├── cms/                  # Projet Strapi
+├── public/               # Ressources statiques
+├── src/
+│   ├── app/              # Routes, layouts, SEO et endpoints
+│   ├── components/       # Composants d’interface
+│   ├── content/          # Contenu photographique local de secours
+│   ├── lib/
+│   │   └── cms/          # Accès et normalisation des données Strapi
+│   ├── styles/           # Styles globaux et breakpoints
+│   └── types/            # Contrats de contenu partagés
+├── .env.example          # Variables d’environnement documentées
+└── pnpm-workspace.yaml   # Workspace frontend et CMS
+```
+
+## Déploiement
+
+Avant la mise en production :
+
+1. configurer les variables d’environnement ;
+2. rendre Strapi accessible depuis le serveur Next.js ;
+3. vérifier les permissions en lecture de l’API ;
+4. définir le domaine canonique avec `NEXT_PUBLIC_SITE_URL` ;
+5. exécuter les validations :
+
+```bash
+pnpm lint
+pnpm build
+pnpm cms:build
+```
+
+---
+
+© Fabien Hance

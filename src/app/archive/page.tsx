@@ -3,7 +3,11 @@ import { PhotoArchiveGrid } from "@/components/PhotoArchiveGrid/PhotoArchiveGrid
 import { getPhotos } from "@/lib/photos";
 import styles from "./page.module.scss";
 
-export const metadata: Metadata = { title: "Archive" };
+export const metadata: Metadata = {
+  title: "Archive",
+  description: "Archive photographique de Fabien Hance.",
+  alternates: { canonical: "/archive" },
+};
 
 export default async function ArchivePage() {
   const photos = await getPhotos();
