@@ -33,7 +33,11 @@ export function PhotoEntrance({
     );
 
     const savedPointer = sessionStorage.getItem("photo-pointer-position");
-    if (!savedPointer || !closeCursor.current || !window.matchMedia("(hover: hover)").matches) return;
+    if (
+      !savedPointer
+      || !closeCursor.current
+      || !window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches
+    ) return;
 
     try {
       const pointer = JSON.parse(savedPointer) as { x: number; y: number; at: number };
@@ -80,7 +84,10 @@ export function PhotoEntrance({
   }
 
   function setCloseCursorVisibility(visible: boolean) {
-    if (!closeCursor.current || !window.matchMedia("(hover: hover)").matches) return;
+    if (
+      !closeCursor.current
+      || !window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches
+    ) return;
 
     gsap.to(closeCursor.current, {
       autoAlpha: visible ? 1 : 0,

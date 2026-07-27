@@ -11,7 +11,10 @@ export function PhotoCursor() {
 
   useEffect(() => {
     const element = cursor.current;
-    if (!element || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    if (
+      !element
+      || !window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches
+    ) return;
 
     if (pathname.startsWith("/photo/")) {
       gsap.killTweensOf(element);
