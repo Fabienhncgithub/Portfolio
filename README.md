@@ -235,4 +235,5 @@ pnpm cms:build
 ```
 
 Le frontend utilise l’adaptateur OpenNext officiel pour générer un Worker Cloudflare compatible
-avec les routes App Router, le rendu serveur et l’optimisation des images.
+avec les routes App Router, le rendu serveur et l’optimisation des images. L’archive de
+déploiement doit conserver l’ensemble des dépendances serveur produites par OpenNext.
