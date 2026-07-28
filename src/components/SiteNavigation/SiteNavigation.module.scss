@@ -56,7 +56,8 @@
   }
 
   &:hover::after,
-  &:focus-visible::after {
+  &:focus-visible::after,
+  &[aria-current="page"]::after {
     transform: scaleX(1);
     transform-origin: left;
   }
@@ -80,7 +81,7 @@
   }
 }
 
-@media (max-width: (bp.$laptop - 1px)) {
+@include bp.compact {
   .siteNavigation {
     position: fixed;
     top: 0;
@@ -153,7 +154,7 @@
   }
 }
 
-@include bp.mobile {
+@include bp.compact {
   .siteNavigation {
     display: flex;
     height: 3rem;

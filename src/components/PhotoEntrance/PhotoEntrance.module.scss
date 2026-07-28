@@ -1,5 +1,44 @@
 .photoLink {
   display: block;
+
+  img {
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 700ms var(--ease-out);
+  }
+
+  &[data-loaded="true"] {
+    img {
+      opacity: 1;
+    }
+
+    .loadingLayer {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+}
+
+.loadingLayer {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      105deg,
+      transparent 35%,
+      rgb(255 255 255 / 32%) 50%,
+      transparent 65%
+    ),
+    #e8e6df;
+  background-position: 140% 0, 0 0;
+  background-size: 220% 100%, 100% 100%;
+  opacity: 1;
+  visibility: visible;
+  animation: loadingSweep 1.8s ease-in-out infinite;
+  transition:
+    opacity 500ms var(--ease-out),
+    visibility 500ms;
+  pointer-events: none;
 }
 
 .closeCursor {
@@ -33,12 +72,33 @@
   }
 }
 
+@keyframes loadingSweep {
+  0% {
+    background-position: 140% 0, 0 0;
+  }
+
+  100% {
+    background-position: -120% 0, 0 0;
+  }
+}
+
 @media (any-hover: hover) and (any-pointer: fine) {
-  .photoLink {
+  :global(html[data-custom-cursor-ready="true"]) .photoLink {
     cursor: none;
   }
 
-  .closeCursor {
+  :global(html[data-custom-cursor-ready="true"]) .closeCursor {
     display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photoLink img,
+  .loadingLayer {
+    transition: none;
+  }
+
+  .loadingLayer {
+    animation: none;
   }
 }

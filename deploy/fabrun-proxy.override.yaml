@@ -1,0 +1,14 @@
+services:
+  web:
+    volumes:
+      - /opt/photography-portfolio/deploy/Caddyfile.proxy:/etc/caddy/Caddyfile:ro
+      - /opt/fabrun/deploy/Caddyfile:/etc/caddy/fabrun.Caddyfile:ro
+      - /opt/photography-portfolio/deploy/Caddyfile.portfolio:/etc/caddy/portfolio.Caddyfile:ro
+    networks:
+      - fabrun
+      - photography-edge
+
+networks:
+  photography-edge:
+    external: true
+    name: photography-edge

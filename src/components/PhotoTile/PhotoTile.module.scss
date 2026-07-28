@@ -1,4 +1,8 @@
 .photoTile {
+  a {
+    display: block;
+  }
+
   figure {
     position: relative;
   }
@@ -26,7 +30,7 @@
 }
 
 @media (any-hover: hover) and (any-pointer: fine) {
-  .photoTile a {
+  :global(html[data-custom-cursor-ready="true"]) .photoTile a {
     cursor: none;
   }
 }

@@ -5,10 +5,35 @@ import gsap from "gsap";
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import type { MouseEvent } from "react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import { getSessionItem, removeSessionItem } from "@/lib/sessionStorage";
 import styles from "./PhotoEntrance.module.scss";
 
 gsap.registerPlugin(useGSAP);
+
+type SavedPointer = {
+  x: number;
+  y: number;
+  at: number;
+};
+
+function parseSavedPointer(value: string): SavedPointer | undefined {
+  try {
+    const candidate: unknown = JSON.parse(value);
+    if (!candidate || typeof candidate !== "object") return;
+
+    const pointer = candidate as Partial<SavedPointer>;
+    if (
+      !Number.isFinite(pointer.x)
+      || !Number.isFinite(pointer.y)
+      || !Number.isFinite(pointer.at)
+    ) return;
+
+    return pointer as SavedPointer;
+  } catch {
+    return;
+  }
+}
 
 export function PhotoEntrance({
   children,
@@ -22,29 +47,47 @@ export function PhotoEntrance({
   const container = useRef<HTMLDivElement>(null);
   const closeCursor = useRef<HTMLSpanElement>(null);
 
+  useEffect(() => {
+    const element = closeCursor.current;
+    return () => {
+      if (element) gsap.killTweensOf(element);
+    };
+  }, []);
+
+  useEffect(() => {
+    const link = container.current?.querySelector(`.${styles.photoLink}`);
+    const image = link?.querySelector("img");
+    if (!link || !image) return;
+
+    const reveal = () => link.setAttribute("data-loaded", "true");
+
+    if (image.complete && image.naturalWidth > 0) {
+      reveal();
+      return;
+    }
+
+    image.addEventListener("load", reveal, { once: true });
+    return () => image.removeEventListener("load", reveal);
+  }, []);
+
   useGSAP(() => {
-    const image = container.current?.querySelector("img");
-    if (!image || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    gsap.fromTo(
-      image,
-      { autoAlpha: 0, scale: 0.995 },
-      { autoAlpha: 1, scale: 1, duration: 0.7, ease: "power3.out" },
-    );
-
-    const savedPointer = sessionStorage.getItem("photo-pointer-position");
-    if (
-      !savedPointer
-      || !closeCursor.current
-      || !window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches
-    ) return;
+    const savedPointer = getSessionItem("photo-pointer-position");
+    if (!savedPointer) return;
 
     try {
-      const pointer = JSON.parse(savedPointer) as { x: number; y: number; at: number };
+      if (
+        !closeCursor.current
+        || !window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches
+      ) return;
+
+      const pointer = parseSavedPointer(savedPointer);
+      if (!pointer) return;
+
       const link = closeCursor.current.closest("a");
       const bounds = link?.getBoundingClientRect();
+      const pointerAge = Date.now() - pointer.at;
 
-      if (bounds && Date.now() - pointer.at < 2000) {
+      if (bounds && pointerAge >= 0 && pointerAge < 2000) {
         gsap.set(closeCursor.current, {
           x: pointer.x - bounds.left,
           y: pointer.y - bounds.top,
@@ -58,7 +101,7 @@ export function PhotoEntrance({
         });
       }
     } finally {
-      sessionStorage.removeItem("photo-pointer-position");
+      removeSessionItem("photo-pointer-position");
     }
   }, { scope: container });
 
@@ -101,7 +144,7 @@ export function PhotoEntrance({
   return (
     <div ref={container}>
       <Link
-        aria-label="Retour à toutes les photographies"
+        aria-label="Back to all photographs"
         className={`${className ?? ""} ${styles.photoLink}`}
         href="/"
         onMouseEnter={(event) => {
@@ -112,6 +155,7 @@ export function PhotoEntrance({
         onMouseMove={moveCloseCursor}
         style={style}
       >
+        <span className={styles.loadingLayer} aria-hidden="true" />
         {children}
         <span className={styles.closeCursor} ref={closeCursor} aria-hidden="true" />
       </Link>

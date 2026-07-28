@@ -9,6 +9,7 @@ export default async function Home() {
   return (
     <GalleryEntrance>
       <div className={styles.homePage}>
+        <h1 className="visually-hidden">Fabien Hance — Photography portfolio</h1>
         <PhotoGrid photos={photos} />
       </div>
     </GalleryEntrance>

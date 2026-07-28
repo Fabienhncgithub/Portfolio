@@ -21,7 +21,7 @@ export async function generateMetadata({
     photo.title,
     photo.location,
     photo.year ? String(photo.year) : undefined,
-    `photographie par ${siteName}`,
+    `photograph by ${siteName}`,
   ].filter(Boolean).join(" — ");
 
   return {
@@ -30,13 +30,16 @@ export async function generateMetadata({
     alternates: { canonical: `/photo/${photo.slug}` },
     openGraph: {
       type: "article",
+      url: `/photo/${photo.slug}`,
+      siteName,
+      locale: "en_GB",
       title: photo.title,
       description,
       images: [{
         url: photo.image,
         width: photo.width,
         height: photo.height,
-        alt: `${photo.title}${photo.location ? `, ${photo.location}` : ""}`,
+        alt: photo.alt,
       }],
     },
     twitter: {
@@ -59,40 +62,50 @@ export default async function PhotoPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [photo, photos] = await Promise.all([getPhoto(slug), getPhotos()]);
+  const photos = await getPhotos();
+  const photo = photos.find((item) => item.slug === slug);
   if (!photo) notFound();
 
   const index = photos.findIndex((item) => item.slug === slug);
   const previous = photos[(index - 1 + photos.length) % photos.length];
   const next = photos[(index + 1) % photos.length];
   const hasAdjacentPhotos = photos.length > 1;
+  const locationDetails = [
+    photo.location,
+    photo.year ? String(photo.year) : undefined,
+  ].filter(Boolean).join(", ");
 
   return (
-    <article className={styles.photoPage} data-photo-page>
+    <article className={styles.photoPage} data-photo-page data-photo-slug={photo.slug}>
+      <h1 className="visually-hidden">{photo.title}</h1>
       <PhotoKeyboardNavigation
+        currentSlug={photo.slug}
         previousHref={hasAdjacentPhotos ? `/photo/${previous.slug}` : undefined}
         nextHref={hasAdjacentPhotos ? `/photo/${next.slug}` : undefined}
+        swipeSurfaceId="photo-swipe-surface"
       />
       <Link
-        aria-label="Fermer la photographie et revenir à la galerie"
+        aria-label="Close the photograph and return to the gallery"
         className={styles.closePhoto}
         href="/"
       >
         <span aria-hidden="true" />
       </Link>
-      <PhotoEntrance
-        className={styles.photo}
-        style={{ "--photo-detail-ratio": `${photo.width} / ${photo.height}` } as React.CSSProperties}
-      >
-        <Image
-          alt={`${photo.title}, ${photo.location}`}
-          fill
-          priority
-          sizes="100vw"
-          src={photo.image}
-        />
-      </PhotoEntrance>
-      <nav className={styles.pagination} aria-label="Photographies adjacentes">
+      <div id="photo-swipe-surface">
+        <PhotoEntrance
+          className={styles.photo}
+          style={{ "--photo-detail-ratio": `${photo.width} / ${photo.height}` } as React.CSSProperties}
+        >
+          <Image
+            alt={photo.alt}
+            fill
+            priority
+            sizes="100vw"
+            src={photo.image}
+          />
+        </PhotoEntrance>
+      </div>
+      <nav className={styles.pagination} aria-label="Adjacent photographs">
         {hasAdjacentPhotos && (
           <span className={styles.adjacent}>
             <Link className={styles.previous} href={`/photo/${previous.slug}`}>
@@ -108,8 +121,8 @@ export default async function PhotoPage({
       </nav>
       <div className={styles.meta}>
         <div>
-          <h1>{photo.title}</h1>
-          <p>{photo.location}, {photo.year}</p>
+          <p className={styles.title}>{photo.title}</p>
+          {locationDetails && <p>{locationDetails}</p>}
         </div>
         <div>
           {photo.camera && <p>{photo.camera}</p>}

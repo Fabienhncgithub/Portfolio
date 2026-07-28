@@ -2,6 +2,7 @@
   "name": "photography-portfolio-cms",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.15.1",
   "description": "Strapi CMS for the mobile-first Photography Portfolio",
   "scripts": {
     "build": "strapi build",
@@ -20,6 +21,7 @@
     "@strapi/plugin-users-permissions": "5.51.0",
     "@strapi/strapi": "5.51.0",
     "better-sqlite3": "12.8.0",
+    "pg": "8.16.3",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.30.3",

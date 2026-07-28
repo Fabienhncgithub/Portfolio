@@ -2,17 +2,23 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { updateGalleryReturnSlug } from "@/lib/galleryReturnState";
 
 export function PhotoKeyboardNavigation({
   previousHref,
   nextHref,
+  currentSlug,
+  swipeSurfaceId,
 }: {
   previousHref?: string;
   nextHref?: string;
+  currentSlug: string;
+  swipeSurfaceId?: string;
 }) {
   const router = useRouter();
 
   useEffect(() => {
+    updateGalleryReturnSlug(currentSlug);
     router.prefetch("/");
     if (previousHref) router.prefetch(previousHref);
     if (nextHref) router.prefetch(nextHref);
@@ -42,53 +48,129 @@ export function PhotoKeyboardNavigation({
 
     window.addEventListener("keydown", navigate);
     return () => window.removeEventListener("keydown", navigate);
-  }, [nextHref, previousHref, router]);
+  }, [currentSlug, nextHref, previousHref, router]);
 
   useEffect(() => {
+    if (!swipeSurfaceId || (!previousHref && !nextHref)) return;
+
+    const surface = document.getElementById(swipeSurfaceId);
+    if (!surface) return;
+
     let startX = 0;
     let startY = 0;
     let currentX = 0;
     let currentY = 0;
+    let touchIdentifier = -1;
+    let intent: "horizontal" | "pending" | "vertical" = "pending";
     let tracking = false;
 
+    const resetSwipe = () => {
+      intent = "pending";
+      touchIdentifier = -1;
+      tracking = false;
+    };
+
+    const matchingTouch = (touches: TouchList) => {
+      for (let index = 0; index < touches.length; index += 1) {
+        if (touches[index].identifier === touchIdentifier) return touches[index];
+      }
+    };
+
+    // The scene itself is intentionally a link back to the gallery. It remains
+    // swipeable, while taps keep their native link behavior.
+    const isPhotoImageLink = (element: HTMLElement) => (
+      element instanceof HTMLAnchorElement
+      && surface.contains(element)
+      && Boolean(element.querySelector("img"))
+    );
+
+    const startedOnIgnoredControl = (target: EventTarget | null) => {
+      if (!(target instanceof Element)) return true;
+
+      const interactive = target.closest<HTMLElement>(
+        "a, button, input, textarea, select, summary, [role='button'], [contenteditable='true']",
+      );
+
+      return Boolean(interactive && !isPhotoImageLink(interactive));
+    };
+
     const startSwipe = (event: TouchEvent) => {
-      if (event.touches.length !== 1) {
-        tracking = false;
+      if (event.touches.length !== 1 || startedOnIgnoredControl(event.target)) {
+        resetSwipe();
         return;
       }
 
       const touch = event.touches[0];
+      const edgeGuard = Math.max(24, Math.min(40, window.innerWidth * 0.08));
+      if (
+        touch.clientX <= edgeGuard
+        || touch.clientX >= window.innerWidth - edgeGuard
+      ) {
+        resetSwipe();
+        return;
+      }
+
       startX = touch.clientX;
       startY = touch.clientY;
       currentX = startX;
       currentY = startY;
+      touchIdentifier = touch.identifier;
+      intent = "pending";
       tracking = true;
     };
 
     const trackSwipe = (event: TouchEvent) => {
-      if (!tracking || event.touches.length !== 1) return;
+      if (!tracking || event.touches.length !== 1) {
+        resetSwipe();
+        return;
+      }
 
-      const touch = event.touches[0];
+      const touch = matchingTouch(event.touches);
+      if (!touch) {
+        resetSwipe();
+        return;
+      }
+
       currentX = touch.clientX;
       currentY = touch.clientY;
       const distanceX = currentX - startX;
       const distanceY = currentY - startY;
+      const absoluteX = Math.abs(distanceX);
+      const absoluteY = Math.abs(distanceY);
 
-      if (Math.abs(distanceX) > 12 && Math.abs(distanceX) > Math.abs(distanceY) * 1.25) {
-        event.preventDefault();
+      if (intent === "pending" && Math.max(absoluteX, absoluteY) >= 12) {
+        if (absoluteX > absoluteY * 1.25) intent = "horizontal";
+        else if (absoluteY > absoluteX * 1.1) intent = "vertical";
       }
+
+      if (intent === "vertical") {
+        resetSwipe();
+        return;
+      }
+
+      if (intent === "horizontal" && event.cancelable) event.preventDefault();
     };
 
-    const endSwipe = () => {
+    const endSwipe = (event: TouchEvent) => {
       if (!tracking) return;
-      tracking = false;
+
+      const touch = matchingTouch(event.changedTouches);
+      if (touch) {
+        currentX = touch.clientX;
+        currentY = touch.clientY;
+      }
 
       const distanceX = currentX - startX;
       const distanceY = currentY - startY;
-      const threshold = Math.max(56, window.innerWidth * 0.14);
+      const threshold = Math.max(56, Math.min(96, window.innerWidth * 0.14));
       const isHorizontal = Math.abs(distanceX) > Math.abs(distanceY) * 1.35;
+      const shouldNavigate =
+        intent === "horizontal"
+        && isHorizontal
+        && Math.abs(distanceX) >= threshold;
 
-      if (!isHorizontal || Math.abs(distanceX) < threshold) return;
+      resetSwipe();
+      if (!shouldNavigate) return;
 
       if (distanceX < 0 && nextHref) {
         router.push(nextHref);
@@ -97,22 +179,18 @@ export function PhotoKeyboardNavigation({
       }
     };
 
-    const cancelSwipe = () => {
-      tracking = false;
-    };
-
-    window.addEventListener("touchstart", startSwipe, { passive: true });
-    window.addEventListener("touchmove", trackSwipe, { passive: false });
-    window.addEventListener("touchend", endSwipe, { passive: true });
-    window.addEventListener("touchcancel", cancelSwipe, { passive: true });
+    surface.addEventListener("touchstart", startSwipe, { passive: true });
+    surface.addEventListener("touchmove", trackSwipe, { passive: false });
+    surface.addEventListener("touchend", endSwipe, { passive: true });
+    surface.addEventListener("touchcancel", resetSwipe, { passive: true });
 
     return () => {
-      window.removeEventListener("touchstart", startSwipe);
-      window.removeEventListener("touchmove", trackSwipe);
-      window.removeEventListener("touchend", endSwipe);
-      window.removeEventListener("touchcancel", cancelSwipe);
+      surface.removeEventListener("touchstart", startSwipe);
+      surface.removeEventListener("touchmove", trackSwipe);
+      surface.removeEventListener("touchend", endSwipe);
+      surface.removeEventListener("touchcancel", resetSwipe);
     };
-  }, [nextHref, previousHref, router]);
+  }, [nextHref, previousHref, router, swipeSurfaceId]);
 
   return null;
 }

@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
 import { FadeIn } from "@/components/FadeIn/FadeIn";
+import { pageMetadata } from "@/lib/site";
 import styles from "./page.module.scss";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Contact",
-  description: "Contacter Fabien Hance pour une commande, un tirage ou une collaboration.",
-  alternates: { canonical: "/contact" },
-};
+  description: "Contact Fabien Hance for commissions, prints or collaborations.",
+  path: "/contact",
+});
 
 export default function ContactPage() {
   return (

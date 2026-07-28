@@ -9,13 +9,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticPages.map((path) => ({
       url: absoluteUrl(path || "/"),
-      lastModified: new Date(),
       changeFrequency: path ? "monthly" as const : "weekly" as const,
       priority: path ? 0.7 : 1,
     })),
     ...photos.map((photo) => ({
       url: absoluteUrl(`/photo/${encodeURIComponent(photo.slug)}`),
-      lastModified: new Date(),
+      ...(photo.updatedAt ? { lastModified: new Date(photo.updatedAt) } : {}),
       changeFrequency: "monthly" as const,
       priority: 0.8,
       images: [photo.image],
