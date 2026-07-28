@@ -23,7 +23,7 @@ export default function AboutPage() {
       <FadeIn className={styles.copy}>
         <div>
           <LiquidHeading as="p">
-            I rarely head out with a plan. Most of these photographs were taken while travelling, hiking or simply enjoying the moment. Film whenever I can, digital when I need to.
+            An evolving collection of photographs gathered along the way. No projects or themes, just places, light and moments worth keeping. Mostly film, occasionally digital.
           </LiquidHeading>
         </div>
       </FadeIn>

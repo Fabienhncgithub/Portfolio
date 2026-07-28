@@ -98,6 +98,16 @@ export default async function PhotoPage({
         nextHref={hasAdjacentPhotos ? `/photo/${next.slug}` : undefined}
         previousImage={hasAdjacentPhotos ? preloadImage(previous.image) : undefined}
         nextImage={hasAdjacentPhotos ? preloadImage(next.image) : undefined}
+        previousPreviewImage={
+          hasAdjacentPhotos && previous.gridImage
+            ? preloadImage(previous.gridImage)
+            : undefined
+        }
+        nextPreviewImage={
+          hasAdjacentPhotos && next.gridImage
+            ? preloadImage(next.gridImage)
+            : undefined
+        }
         swipeSurfaceId="photo-swipe-surface"
       />
       <Link
@@ -113,12 +123,24 @@ export default async function PhotoPage({
         <PhotoEntrance
           key={photo.slug}
           className={styles.photo}
+          preview={
+            photo.gridImage && photo.gridImage !== photo.image ? (
+              <Image
+                alt=""
+                aria-hidden="true"
+                fill
+                priority
+                sizes="100vw"
+                src={photo.gridImage}
+              />
+            ) : undefined
+          }
           style={{ "--photo-detail-ratio": `${photo.width} / ${photo.height}` } as React.CSSProperties}
         >
           <Image
             alt={photo.alt}
             fill
-            priority
+            priority={!photo.gridImage}
             sizes="100vw"
             src={photo.image}
           />

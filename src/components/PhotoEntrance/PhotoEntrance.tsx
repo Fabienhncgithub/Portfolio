@@ -38,10 +38,12 @@ function parseSavedPointer(value: string): SavedPointer | undefined {
 export function PhotoEntrance({
   children,
   className,
+  preview,
   style,
 }: {
   children: ReactNode;
   className?: string;
+  preview?: ReactNode;
   style?: CSSProperties;
 }) {
   const container = useRef<HTMLDivElement>(null);
@@ -56,19 +58,32 @@ export function PhotoEntrance({
 
   useEffect(() => {
     const link = container.current?.querySelector(`.${styles.photoLink}`);
-    const image = link?.querySelector("img");
-    if (!link || !image) return;
+    const previewImage = link?.querySelector<HTMLImageElement>(
+      `.${styles.previewImage} img`,
+    );
+    const fullImage = link?.querySelector<HTMLImageElement>(
+      `.${styles.fullImage} img`,
+    );
+    if (!link || !fullImage) return;
 
-    const reveal = () => link.setAttribute("data-loaded", "true");
+    const revealPreview = () => {
+      link.setAttribute("data-preview-loaded", "true");
+    };
+    const revealFull = () => {
+      link.setAttribute("data-full-loaded", "true");
+    };
 
-    if (image.complete && image.naturalWidth > 0) {
-      reveal();
-      return;
-    }
+    if (previewImage?.complete && previewImage.naturalWidth > 0) revealPreview();
+    else previewImage?.addEventListener("load", revealPreview, { once: true });
 
-    image.addEventListener("load", reveal, { once: true });
-    return () => image.removeEventListener("load", reveal);
-  }, []);
+    if (fullImage.complete && fullImage.naturalWidth > 0) revealFull();
+    else fullImage.addEventListener("load", revealFull, { once: true });
+
+    return () => {
+      previewImage?.removeEventListener("load", revealPreview);
+      fullImage.removeEventListener("load", revealFull);
+    };
+  }, [preview]);
 
   useGSAP(() => {
     const savedPointer = getSessionItem("photo-pointer-position");
@@ -158,7 +173,8 @@ export function PhotoEntrance({
         style={style}
       >
         <span className={styles.loadingLayer} aria-hidden="true" />
-        {children}
+        {preview && <span className={styles.previewImage}>{preview}</span>}
+        <span className={styles.fullImage}>{children}</span>
         <span className={styles.closeCursor} ref={closeCursor} aria-hidden="true" />
       </Link>
     </div>

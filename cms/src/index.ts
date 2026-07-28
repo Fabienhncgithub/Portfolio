@@ -8,9 +8,24 @@ const lifecycle = {
       .findOne({ where: { type: "public" } });
 
     if (publicRole) {
-      await strapi.db
-        .query("plugin::users-permissions.permission")
-        .deleteMany({ where: { role: publicRole.id } });
+      const permissions = strapi.db
+        .query("plugin::users-permissions.permission");
+
+      await permissions.deleteMany({ where: { role: publicRole.id } });
+
+      if (process.env.NODE_ENV === "development") {
+        for (const action of [
+          "api::photo.photo.find",
+          "api::photo.photo.findOne",
+        ]) {
+          await permissions.create({
+            data: {
+              action,
+              role: publicRole.id,
+            },
+          });
+        }
+      }
     }
 
     const pluginStore = strapi.store({

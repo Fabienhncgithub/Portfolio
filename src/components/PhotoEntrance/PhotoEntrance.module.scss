@@ -1,21 +1,64 @@
 .photoLink {
   display: block;
+}
+
+.previewImage,
+.fullImage {
+  position: absolute;
+  inset: 0;
+  display: block;
 
   img {
     z-index: 1;
     opacity: 0;
-    transition: opacity 700ms var(--ease-out);
+  }
+}
+
+.previewImage {
+  z-index: 1;
+  opacity: 1;
+  transition: opacity 900ms var(--ease-out);
+
+  img {
+    filter: blur(2px);
+    transition:
+      opacity 480ms var(--ease-out),
+      filter 700ms var(--ease-out);
+  }
+}
+
+.fullImage {
+  z-index: 2;
+
+  img {
+    transition: opacity 850ms var(--ease-out);
+  }
+}
+
+.photoLink[data-preview-loaded="true"] {
+  .previewImage img {
+    filter: blur(0);
+    opacity: 1;
   }
 
-  &[data-loaded="true"] {
-    img {
-      opacity: 1;
-    }
+  .loadingLayer {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
 
-    .loadingLayer {
-      opacity: 0;
-      visibility: hidden;
-    }
+.photoLink[data-full-loaded="true"] {
+  .fullImage img {
+    opacity: 1;
+  }
+
+  .previewImage {
+    opacity: 0;
+  }
+
+  .loadingLayer {
+    opacity: 0;
+    visibility: hidden;
   }
 }
 
@@ -39,6 +82,19 @@
     opacity 500ms var(--ease-out),
     visibility 500ms;
   pointer-events: none;
+
+  &::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 38px;
+    height: 1px;
+    background: rgb(24 24 23 / 24%);
+    content: "";
+    transform: translate(-50%, -50%) scaleX(0.2);
+    transform-origin: left;
+    animation: loadingLine 1.8s var(--ease-out) infinite;
+  }
 }
 
 .closeCursor {
@@ -82,6 +138,19 @@
   }
 }
 
+@keyframes loadingLine {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: translate(-50%, -50%) scaleX(0.2);
+  }
+
+  50% {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scaleX(1);
+  }
+}
+
 @media (any-hover: hover) and (any-pointer: fine) {
   :global(html[data-custom-cursor-ready="true"]) .photoLink {
     cursor: none;
@@ -93,12 +162,15 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .photoLink img,
+  .previewImage,
+  .previewImage img,
+  .fullImage img,
   .loadingLayer {
     transition: none;
   }
 
-  .loadingLayer {
+  .loadingLayer,
+  .loadingLayer::after {
     animation: none;
   }
 }

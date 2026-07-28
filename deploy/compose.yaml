@@ -98,6 +98,8 @@ services:
           - portfolio-web
     ports:
       - "127.0.0.1:3000:3000"
+    volumes:
+      - next-cache:/app/.next/cache
 
 networks:
   private:
@@ -112,3 +114,4 @@ volumes:
   strapi-uploads:
     external: true
     name: photography-portfolio_strapi-uploads
+  next-cache:

@@ -15,6 +15,8 @@ export function PhotoKeyboardNavigation({
   nextHref,
   previousImage,
   nextImage,
+  previousPreviewImage,
+  nextPreviewImage,
   currentSlug,
   swipeSurfaceId,
 }: {
@@ -22,6 +24,8 @@ export function PhotoKeyboardNavigation({
   nextHref?: string;
   previousImage?: PreloadImage;
   nextImage?: PreloadImage;
+  previousPreviewImage?: PreloadImage;
+  nextPreviewImage?: PreloadImage;
   currentSlug: string;
   swipeSurfaceId?: string;
 }) {
@@ -61,7 +65,12 @@ export function PhotoKeyboardNavigation({
   }, [currentSlug, nextHref, previousHref, router]);
 
   useEffect(() => {
-    const preloads = [previousImage, nextImage]
+    const preloads = [
+      previousPreviewImage,
+      nextPreviewImage,
+      previousImage,
+      nextImage,
+    ]
       .filter((image): image is PreloadImage => Boolean(image))
       .map((image) => {
         const preload = new window.Image();
@@ -77,7 +86,12 @@ export function PhotoKeyboardNavigation({
         preload.onerror = null;
       }
     };
-  }, [nextImage, previousImage]);
+  }, [
+    nextImage,
+    nextPreviewImage,
+    previousImage,
+    previousPreviewImage,
+  ]);
 
   useEffect(() => {
     if (!swipeSurfaceId || (!previousHref && !nextHref)) return;
