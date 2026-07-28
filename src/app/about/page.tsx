@@ -14,8 +14,7 @@ export const metadata = pageMetadata({
 export default function AboutPage() {
   return (
     <section className={styles.aboutPage}>
-      <FadeIn>
-        <p className={styles.eyebrow}>About</p>
+      <FadeIn className={styles.intro}>
         <LiquidHeading>
           A personal archive of landscapes, mountain trails and everyday moments.
         </LiquidHeading>
