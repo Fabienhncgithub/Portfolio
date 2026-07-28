@@ -18,7 +18,7 @@ docker exec photography-portfolio-postgres-1 sh -c \
   > "${database_backup}"
 
 docker exec photography-portfolio-cms-1 \
-  tar -czf - -C /app/public/uploads . \
+  tar -czf - -C /app/cms/public/uploads . \
   > "${uploads_backup}"
 
 test -s "${database_backup}"

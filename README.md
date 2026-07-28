@@ -234,6 +234,8 @@ Avant une mise en production :
 PostgreSQL et les uploads Strapi utilisent des volumes Docker externes :
 `photography-portfolio_postgres-data` et `photography-portfolio_strapi-uploads`.
 Compose peut reconstruire ou supprimer ses conteneurs sans supprimer ces volumes.
+Le volume média est monté sur `/app/cms/public/uploads`, qui correspond au répertoire de travail
+réel de Strapi dans l’image de production.
 
 Sur le VPS, toujours déployer avec :
 

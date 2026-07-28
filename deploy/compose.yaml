@@ -49,7 +49,7 @@ services:
       retries: 20
       start_period: 45s
     volumes:
-      - strapi-uploads:/app/public/uploads
+      - strapi-uploads:/app/cms/public/uploads
     networks:
       private:
       edge:
