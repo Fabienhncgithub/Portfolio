@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -70,6 +70,20 @@ export default async function PhotoPage({
   const previous = photos[(index - 1 + photos.length) % photos.length];
   const next = photos[(index + 1) % photos.length];
   const hasAdjacentPhotos = photos.length > 1;
+  const preloadImage = (image: string) => {
+    const { props } = getImageProps({
+      alt: "",
+      fill: true,
+      sizes: "100vw",
+      src: image,
+    });
+
+    return {
+      sizes: props.sizes,
+      src: props.src,
+      srcSet: props.srcSet,
+    };
+  };
   const locationDetails = [
     photo.location,
     photo.year ? String(photo.year) : undefined,
@@ -82,6 +96,8 @@ export default async function PhotoPage({
         currentSlug={photo.slug}
         previousHref={hasAdjacentPhotos ? `/photo/${previous.slug}` : undefined}
         nextHref={hasAdjacentPhotos ? `/photo/${next.slug}` : undefined}
+        previousImage={hasAdjacentPhotos ? preloadImage(previous.image) : undefined}
+        nextImage={hasAdjacentPhotos ? preloadImage(next.image) : undefined}
         swipeSurfaceId="photo-swipe-surface"
       />
       <Link
@@ -95,6 +111,7 @@ export default async function PhotoPage({
       </Link>
       <div id="photo-swipe-surface">
         <PhotoEntrance
+          key={photo.slug}
           className={styles.photo}
           style={{ "--photo-detail-ratio": `${photo.width} / ${photo.height}` } as React.CSSProperties}
         >

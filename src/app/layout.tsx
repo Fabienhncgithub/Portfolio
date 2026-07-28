@@ -93,10 +93,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <SiteNavigation />
         <PhotoCursor />
         <main>{children}</main>
-        <footer>
-          <span>© {new Date().getFullYear()} Fabien Hance</span>
-          {measurementId && <AnalyticsPreferencesButton />}
-        </footer>
+        {measurementId && (
+          <footer>
+            <AnalyticsPreferencesButton />
+          </footer>
+        )}
         <Analytics measurementId={measurementId} />
       </body>
     </html>

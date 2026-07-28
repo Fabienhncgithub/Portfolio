@@ -113,6 +113,15 @@ function normalizePhoto(entry: unknown): Photo | undefined {
   const media = mediaAttributes(fields?.image);
   const imageUrl = text(media?.url);
   const absoluteImageUrl = imageUrl ? absoluteMediaUrl(imageUrl) : undefined;
+  const formats = record(media?.formats);
+  const gridFormat =
+    record(formats?.large)
+    ?? record(formats?.medium)
+    ?? record(formats?.small);
+  const gridImageUrl = text(gridFormat?.url);
+  const absoluteGridImageUrl = gridImageUrl
+    ? absoluteMediaUrl(gridImageUrl)
+    : undefined;
   const slug = boundedText(fields?.slug, 120);
   const title = boundedText(fields?.title, 160);
   const year = positiveInteger(fields?.year);
@@ -127,6 +136,7 @@ function normalizePhoto(entry: unknown): Photo | undefined {
     year: year && year >= 1900 && year <= 2100 ? year : undefined,
     category: photoCategory(fields.category),
     image: absoluteImageUrl,
+    gridImage: absoluteGridImageUrl,
     width: positiveNumber(media?.width) ?? positiveNumber(fields.width) ?? 1600,
     height: positiveNumber(media?.height) ?? positiveNumber(fields.height) ?? 1200,
     camera: boundedText(fields.camera, 160),

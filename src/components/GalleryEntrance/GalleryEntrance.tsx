@@ -16,7 +16,7 @@ import {
 
 gsap.registerPlugin(useGSAP, ScrollToPlugin);
 
-const entranceStorageKey = "gallery-entrance-played";
+const entranceStorageKey = "gallery-entrance-played-v2";
 
 export function GalleryEntrance({ children }: { children: ReactNode }) {
   const gallery = useRef<HTMLDivElement>(null);
@@ -101,6 +101,7 @@ export function GalleryEntrance({ children }: { children: ReactNode }) {
     const interruptEntrance = () => {
       window.cancelAnimationFrame(entranceFrame);
       entrance?.kill();
+      setSessionItem(entranceStorageKey, "true");
       restoreBrowserBehavior();
     };
 
@@ -115,7 +116,6 @@ export function GalleryEntrance({ children }: { children: ReactNode }) {
 
       document.documentElement.dataset.galleryEntering = "true";
       window.scrollTo(0, start);
-      setSessionItem(entranceStorageKey, "true");
 
       interruptionEvents.forEach((eventName) => {
         window.addEventListener(eventName, interruptEntrance, { once: true, passive: true });
@@ -126,7 +126,10 @@ export function GalleryEntrance({ children }: { children: ReactNode }) {
           scrollTo: { y: 0, autoKill: true },
           duration: 1,
           ease: "power2.inOut",
-          onComplete: restoreBrowserBehavior,
+          onComplete: () => {
+            setSessionItem(entranceStorageKey, "true");
+            restoreBrowserBehavior();
+          },
           onInterrupt: restoreBrowserBehavior,
         });
       });

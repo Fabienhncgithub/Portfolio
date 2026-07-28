@@ -15,22 +15,83 @@
   aspect-ratio: var(--photo-ratio, 4 / 3);
 
   img {
+    z-index: 1;
     object-fit: cover;
+    filter: blur(3px);
+    opacity: 0;
+    transition:
+      opacity 650ms var(--ease-out),
+      filter 800ms var(--ease-out);
   }
+
+  &[data-image-loaded="true"] {
+    img {
+      filter: blur(0);
+      opacity: 1;
+    }
+
+    .loadingLayer {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+}
+
+.loadingLayer {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      108deg,
+      transparent 38%,
+      rgb(255 255 255 / 26%) 50%,
+      transparent 62%
+    ),
+    #e8e6df;
+  background-position: 130% 0, 0 0;
+  background-size: 220% 100%, 100% 100%;
+  animation: loadingDrift 2.2s ease-in-out infinite;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 500ms var(--ease-out),
+    visibility 500ms;
+  pointer-events: none;
 }
 
 .colorLayer {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 2;
   background: transparent;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
 }
 
+@keyframes loadingDrift {
+  from {
+    background-position: 130% 0, 0 0;
+  }
+
+  to {
+    background-position: -110% 0, 0 0;
+  }
+}
+
 @media (any-hover: hover) and (any-pointer: fine) {
   :global(html[data-custom-cursor-ready="true"]) .photoTile a {
     cursor: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photoFrame img,
+  .loadingLayer {
+    transition: none;
+  }
+
+  .loadingLayer {
+    animation: none;
   }
 }

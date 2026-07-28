@@ -4,14 +4,24 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { updateGalleryReturnSlug } from "@/lib/galleryReturnState";
 
+type PreloadImage = {
+  sizes?: string;
+  src: string;
+  srcSet?: string;
+};
+
 export function PhotoKeyboardNavigation({
   previousHref,
   nextHref,
+  previousImage,
+  nextImage,
   currentSlug,
   swipeSurfaceId,
 }: {
   previousHref?: string;
   nextHref?: string;
+  previousImage?: PreloadImage;
+  nextImage?: PreloadImage;
   currentSlug: string;
   swipeSurfaceId?: string;
 }) {
@@ -49,6 +59,25 @@ export function PhotoKeyboardNavigation({
     window.addEventListener("keydown", navigate);
     return () => window.removeEventListener("keydown", navigate);
   }, [currentSlug, nextHref, previousHref, router]);
+
+  useEffect(() => {
+    const preloads = [previousImage, nextImage]
+      .filter((image): image is PreloadImage => Boolean(image))
+      .map((image) => {
+        const preload = new window.Image();
+        if (image.sizes) preload.sizes = image.sizes;
+        if (image.srcSet) preload.srcset = image.srcSet;
+        preload.src = image.src;
+        return preload;
+      });
+
+    return () => {
+      for (const preload of preloads) {
+        preload.onload = null;
+        preload.onerror = null;
+      }
+    };
+  }, [nextImage, previousImage]);
 
   useEffect(() => {
     if (!swipeSurfaceId || (!previousHref && !nextHref)) return;

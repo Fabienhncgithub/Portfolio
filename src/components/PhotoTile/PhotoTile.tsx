@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import type { Photo } from "@/lib/photos";
 import { FadeIn } from "@/components/FadeIn/FadeIn";
 import { saveGalleryReturnState } from "@/lib/galleryReturnState";
@@ -30,6 +30,7 @@ export function PhotoTile({
   onPreviewStart?: (photo: Photo, image: HTMLImageElement | null) => void;
 }) {
   const image = useRef<HTMLImageElement>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
     <FadeIn
@@ -62,15 +63,20 @@ export function PhotoTile({
         }}
       >
         <figure>
-          <div className={styles.photoFrame}>
+          <div
+            className={styles.photoFrame}
+            data-image-loaded={imageLoaded ? "true" : undefined}
+          >
+            <span className={styles.loadingLayer} aria-hidden="true" />
             <Image
               alt={photo.alt}
               fill
               ref={image}
               priority={priority}
               data-photo-image
+              onLoad={() => setImageLoaded(true)}
               sizes={sizes}
-              src={photo.image}
+              src={photo.gridImage ?? photo.image}
             />
             <span className={styles.colorLayer} data-photo-color-layer aria-hidden="true" />
           </div>
