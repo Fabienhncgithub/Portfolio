@@ -2,14 +2,21 @@
   "name": "fabien-hance-portfolio",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.15.1",
+  "engines": {
+    "node": ">=20.9.0 <27"
+  },
   "scripts": {
     "dev": "next dev",
     "cms:dev": "pnpm --dir cms develop",
     "cms:build": "pnpm --dir cms build",
-    "build": "next build",
-    "build:hosting": "opennextjs-cloudflare build && node scripts/patch-open-next-worker.mjs",
+    "cms:typecheck": "pnpm --dir cms exec tsc --noEmit",
+    "build": "node scripts/build-next.mjs",
+    "build:hosting": "node scripts/build-hosting.mjs",
+    "check": "pnpm lint && pnpm typecheck && pnpm cms:typecheck",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

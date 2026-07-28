@@ -11,11 +11,20 @@ export function SiteNavigation() {
 
   return (
     <header className={styles.siteNavigation} data-hidden={isPhoto}>
-      <Link className={styles.wordmark} href="/" aria-label="Fabien Hance, accueil">
+      <Link
+        aria-current={pathname === "/" ? "page" : undefined}
+        aria-label="Fabien Hance, home"
+        className={styles.wordmark}
+        href="/"
+      >
         <strong><span>Fabien</span><span>Hance</span></strong>
       </Link>
-      <nav aria-label="Navigation principale">
-        <Link className={styles.aboutLink} href="/about">
+      <nav aria-label="Primary navigation">
+        <Link
+          aria-current={pathname === "/about" ? "page" : undefined}
+          className={styles.aboutLink}
+          href="/about"
+        >
           About
         </Link>
       </nav>

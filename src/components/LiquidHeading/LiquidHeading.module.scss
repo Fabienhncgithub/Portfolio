@@ -1,0 +1,25 @@
+.heading {
+  cursor: default;
+  isolation: isolate;
+  touch-action: pan-y;
+}
+
+.word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.letter {
+  display: inline-block;
+  color: var(--color-ink);
+  opacity: 1;
+  visibility: visible;
+  transform-origin: 50% 70%;
+  will-change: transform, text-shadow;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .letter {
+    will-change: auto;
+  }
+}

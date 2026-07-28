@@ -4,6 +4,7 @@ export const fallbackPhotos: Photo[] = [
   {
     slug: "quiet-morning",
     title: "Quiet morning",
+    alt: "A quiet mountain road crossing a red desert landscape",
     location: "Lac Léman",
     year: 2025,
     category: "Landscape",
@@ -15,6 +16,7 @@ export const fallbackPhotos: Photo[] = [
   {
     slug: "concrete-summer",
     title: "Concrete summer",
+    alt: "A dense city street framed by tall buildings",
     location: "Brussels",
     year: 2024,
     category: "City",
@@ -26,6 +28,7 @@ export const fallbackPhotos: Photo[] = [
   {
     slug: "atlantic-line",
     title: "Atlantic line",
+    alt: "A mountain lake beneath a dramatic sky",
     location: "Portugal",
     year: 2025,
     category: "Travel",
@@ -36,6 +39,7 @@ export const fallbackPhotos: Photo[] = [
   {
     slug: "passing-light",
     title: "Passing light",
+    alt: "A glass office building seen from below",
     location: "Geneva",
     year: 2024,
     category: "Details",
@@ -46,6 +50,7 @@ export const fallbackPhotos: Photo[] = [
   {
     slug: "northbound",
     title: "Northbound",
+    alt: "A mountain landscape lit by soft golden light",
     location: "Iceland",
     year: 2023,
     category: "Landscape",
@@ -57,6 +62,7 @@ export const fallbackPhotos: Photo[] = [
   {
     slug: "after-rain",
     title: "After rain",
+    alt: "A city avenue reflecting blue and magenta evening light",
     location: "Tokyo",
     year: 2024,
     category: "City",
@@ -67,6 +73,7 @@ export const fallbackPhotos: Photo[] = [
   {
     slug: "blue-hour",
     title: "Blue hour",
+    alt: "Colourful waterfront buildings beneath a blue sky",
     location: "Copenhagen",
     year: 2023,
     category: "Travel",
@@ -77,6 +84,7 @@ export const fallbackPhotos: Photo[] = [
   {
     slug: "soft-geometry",
     title: "Soft geometry",
+    alt: "A geometric white building against a pale sky",
     location: "Basel",
     year: 2025,
     category: "Details",

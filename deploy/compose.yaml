@@ -1,0 +1,108 @@
+name: photography-portfolio
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - private
+
+  cms:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.cms
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env.production
+    environment:
+      HOST: 0.0.0.0
+      PORT: 1337
+      NODE_ENV: production
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_SSL: "false"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:1337/_health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 45s
+    volumes:
+      - strapi-uploads:/app/public/uploads
+    networks:
+      private:
+      edge:
+        aliases:
+          - portfolio-cms
+    ports:
+      - "127.0.0.1:1337:1337"
+
+  web:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.web
+      args:
+        NEXT_PUBLIC_SITE_URL: https://www.fabienhance.com
+        STRAPI_URL: https://cms.fabienhance.com
+    restart: unless-stopped
+    depends_on:
+      cms:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_SITE_URL: https://www.fabienhance.com
+      STRAPI_URL: https://cms.fabienhance.com
+      STRAPI_INTERNAL_URL: http://cms:1337
+      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN}
+      STRAPI_WEBHOOK_SECRET: ${STRAPI_WEBHOOK_SECRET}
+      CMS_REQUIRED: "true"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/robots.txt').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      private:
+      edge:
+        aliases:
+          - portfolio-web
+    ports:
+      - "127.0.0.1:3000:3000"
+
+networks:
+  private:
+    internal: true
+  edge:
+    name: photography-edge
+
+volumes:
+  postgres-data:
+  strapi-uploads:

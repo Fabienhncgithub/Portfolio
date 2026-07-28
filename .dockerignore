@@ -1,0 +1,16 @@
+.git
+.github
+.next
+.open-next
+.wrangler
+cms/.cache
+cms/.tmp
+cms/build
+cms/node_modules
+node_modules
+*.log
+.env
+.env.*
+!.env.example
+!cms/.env.example
+

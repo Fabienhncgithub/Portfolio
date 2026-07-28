@@ -2,7 +2,7 @@ $phone: 426px;
 $phone-wide: 496px;
 $tablet: 768px;
 $tablet-wide: 820px;
-$laptop: 1024px;
+$laptop: 1200px;
 $desktop: 1366px;
 $wide: 1920px;
 $short-screen: 44rem;
@@ -37,26 +37,32 @@ $short-screen: 44rem;
   }
 }
 
+@mixin compact {
+  @media (max-width: ($laptop - 1px)), (any-pointer: coarse) {
+    @content;
+  }
+}
+
 @mixin laptop {
-  @media (min-width: $laptop) {
+  @media (min-width: $laptop) and (any-hover: hover) and (any-pointer: fine) {
     @content;
   }
 }
 
 @mixin desktop {
-  @media (min-width: $desktop) {
+  @media (min-width: $desktop) and (any-hover: hover) and (any-pointer: fine) {
     @content;
   }
 }
 
 @mixin wide {
-  @media (min-width: $wide) {
+  @media (min-width: $wide) and (any-hover: hover) and (any-pointer: fine) {
     @content;
   }
 }
 
 @mixin short-screen {
-  @media (max-height: $short-screen) and (min-width: $tablet) {
+  @media (max-height: $short-screen) and (min-width: $laptop) {
     @content;
   }
 }

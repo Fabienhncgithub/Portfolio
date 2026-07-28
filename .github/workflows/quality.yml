@@ -1,0 +1,40 @@
+name: Quality
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
+        with:
+          version: 10.15.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            cms/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --dir cms install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm cms:build
+        env:
+          NODE_ENV: development
+          APP_KEYS: ci-app-key-000000000000000000000001,ci-app-key-000000000000000000000002
+          API_TOKEN_SALT: ci-api-token-salt-000000000000000001
+          ADMIN_JWT_SECRET: ci-admin-jwt-secret-0000000000000001
+          TRANSFER_TOKEN_SALT: ci-transfer-token-salt-000000000001
+          JWT_SECRET: ci-jwt-secret-000000000000000000000001
+          ENCRYPTION_KEY: ci-encryption-key-00000000000000000001
+      - run: pnpm build:hosting

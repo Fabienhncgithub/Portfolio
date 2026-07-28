@@ -46,7 +46,7 @@
   }
 
   &:focus-visible {
-    outline: 1px solid currentColor;
+    outline: 2px solid currentColor;
     outline-offset: -8px;
   }
 }
@@ -121,9 +121,13 @@
   > div:last-child {
     color: var(--color-muted);
   }
+
+  .title {
+    color: var(--color-ink);
+  }
 }
 
-@include bp.mobile {
+@include bp.compact {
   .photoPage {
     padding: 1rem var(--page-gutter) 3rem;
   }

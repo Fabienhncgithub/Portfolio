@@ -1,81 +1,58 @@
 # Photography Portfolio
 
-Portfolio photographique éditorial mobile-first conçu avec Next.js, TypeScript et Strapi.
+Portfolio photographique éditorial, mobile-first, construit avec Next.js, TypeScript et Strapi.
 
-L’interface privilégie les images, la fluidité et une expérience responsive adaptée à chaque
-format : grille éditoriale, couleurs dominantes, navigation tactile, pages photo immersives et
-contenu administré depuis un CMS headless.
-
-## Sommaire
-
-- [Fonctionnalités](#fonctionnalités)
-- [Stack technique](#stack-technique)
-- [Responsive et breakpoints](#responsive-et-breakpoints)
-- [Démarrage rapide](#démarrage-rapide)
-- [Configuration](#configuration)
-- [Connecter Strapi](#connecter-strapi)
-- [Actualisation du contenu](#actualisation-du-contenu)
-- [SEO et Analytics](#seo-et-analytics)
-- [Commandes disponibles](#commandes-disponibles)
-- [Architecture du projet](#architecture-du-projet)
-- [Déploiement](#déploiement)
+L’interface place les images au premier plan : grille responsive, aplats calculés depuis la
+couleur dominante de chaque photographie, navigation tactile, pages photo immersives et retour
+précis dans la galerie.
 
 ## Fonctionnalités
 
-- Grille photographique responsive pour ordinateur, tablette et mobile.
-- Mise en avant de la photographie située au centre de l’écran.
-- Aplats générés depuis la couleur dominante de chaque image.
-- Navigation mobile par balayage vers la gauche ou la droite.
-- Retour à la position précédente dans la galerie après consultation d’une photo.
-- Navigation au clavier sur ordinateur.
-- Contenu administrable avec Strapi et contenu local de secours.
-- Images optimisées par Next.js en AVIF et WebP.
-- Métadonnées SEO, Open Graph, Twitter Cards, sitemap et robots.txt.
-- Données structurées Schema.org.
-- Respect de `prefers-reduced-motion`.
+- Galerie éditoriale adaptée au mobile, à la tablette et au desktop.
+- Photographie active déterminée par sa position réelle au centre du viewport.
+- Aplat propre à chaque image, synchronisé avec le bandeau de titre sur mobile.
+- Navigation par swipe sur la scène photo et par clavier avec `←`, `→` et `Échap`.
+- Retour vers la photographie courante après Previous, Next ou swipe.
+- Images optimisées en AVIF et WebP par Next.js.
+- Contenu Strapi privé avec contenu local de secours explicite.
+- Métadonnées SEO, Open Graph, Twitter Cards, sitemap, robots.txt et Schema.org.
+- États de focus visibles et prise en charge de `prefers-reduced-motion`.
 
-## Stack technique
+## Stack
 
 | Technologie | Usage |
 | --- | --- |
-| [Next.js](https://nextjs.org/) | App Router, rendu, optimisation des images et SEO |
-| [React](https://react.dev/) | Interface utilisateur |
-| [TypeScript](https://www.typescriptlang.org/) | Typage statique |
-| [Strapi](https://strapi.io/) | CMS headless et médiathèque |
-| [GSAP](https://gsap.com/) | Animations et transitions |
-| [Sass](https://sass-lang.com/) | Styles modulaires et responsive |
-| [pnpm](https://pnpm.io/) | Gestion des dépendances et workspace |
+| Next.js 15 | App Router, rendu, optimisation d’images et SEO |
+| React 19 | Interface utilisateur |
+| TypeScript | Typage du frontend et du CMS |
+| Strapi 5 | CMS headless et médiathèque |
+| GSAP | Animations et transitions |
+| Sass Modules | Styles isolés et responsive |
+| OpenNext | Bundle Cloudflare Workers |
+| pnpm 10 | Gestion des dépendances |
 
-## Responsive et breakpoints
+## Responsive
 
-L’expérience est pensée mobile-first : navigation tactile, balayage entre les photographies,
-zones interactives adaptées au pouce et sélection de l’image située au centre de l’écran.
-L’interface évolue ensuite progressivement pour exploiter les grilles multicolonnes, le pointeur
-précis et les écrans de grande largeur.
+Les breakpoints sont centralisés dans `src/styles/_breakpoints.scss`.
 
-Les breakpoints sont centralisés dans `src/styles/_breakpoints.scss` :
-
-| Nom | Largeur | Usage principal |
+| Palier | Largeur | Comportement |
 | --- | --- | --- |
 | `phone` | jusqu’à `426px` | Téléphones compacts |
-| `phone-wide` | de `496px` à `767px` | Téléphones larges |
-| `tablet` | de `768px` à `1023px` | Tablettes |
-| `tablet-wide` | de `820px` à `1023px` | Tablettes larges |
-| `laptop` | à partir de `1024px` | Ordinateurs portables |
-| `desktop` | à partir de `1366px` | Écrans de bureau |
-| `wide` | à partir de `1920px` | Écrans haute définition |
-| `short-screen` | hauteur maximale de `44rem` | Écrans larges de faible hauteur |
+| `mobile` | jusqu’à `767px` | Grille simple et bandeau compact |
+| `tablet` | `768px` à `1199px` | Grille sur deux colonnes |
+| `laptop` | dès `1200px` | Rail latéral et grille sur trois colonnes |
+| `desktop` | dès `1366px` | Galerie élargie |
+| `wide` | dès `1920px` | Mise en page centrée haute définition |
 
-Une media query dédiée à `prefers-reduced-motion` désactive les animations non essentielles.
+Un mode compact supplémentaire s’active sur les écrans tactiles de moins de `1200px` et
+`512px` de hauteur, notamment les téléphones en paysage.
 
-## Démarrage rapide
+## Démarrage
 
 ### Prérequis
 
-- Node.js 20 ou plus récent.
-- pnpm 10 ou plus récent.
-
-### Installation
+- Node.js `20.9` à `26`.
+- pnpm `10.15.1` ou compatible.
 
 ```bash
 git clone https://github.com/Fabienhncgithub/Portfolio.git
@@ -87,43 +64,39 @@ pnpm dev
 
 Ouvrir [http://localhost:3000](http://localhost:3000).
 
-Le frontend reste fonctionnel sans Strapi : lorsque le CMS n’est pas configuré ou indisponible,
-les photographies de `src/content/photos.ts` sont utilisées automatiquement.
+Sans CMS disponible, le frontend utilise les photographies de secours définies dans
+`src/content/photos.ts`.
 
-## Configuration
-
-Copier le fichier d’exemple :
+## Configuration du frontend
 
 ```bash
 cp .env.example .env.local
 ```
 
-| Variable | Obligatoire | Description |
-| --- | --- | --- |
-| `STRAPI_URL` | Pour le CMS | URL privée utilisée par Next.js pour interroger Strapi |
-| `STRAPI_API_TOKEN` | Non | Jeton Strapi en lecture seule si l’API n’est pas publique |
-| `STRAPI_WEBHOOK_SECRET` | Non | Secret partagé utilisé par le webhook de revalidation |
-| `NEXT_PUBLIC_SITE_URL` | Production | URL canonique utilisée pour le SEO et le sitemap |
-| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Non | Identifiant Google Analytics 4 au format `G-…` |
+| Variable | Usage |
+| --- | --- |
+| `STRAPI_URL` | URL serveur de Strapi, en HTTPS hors développement local |
+| `STRAPI_API_TOKEN` | Token privé en lecture seule, requis lorsque Strapi est connecté |
+| `STRAPI_WEBHOOK_SECRET` | Secret aléatoire d’au moins 32 caractères pour la revalidation |
+| `CMS_REQUIRED` | Mettre à `true` en production pour refuser un fallback silencieux |
+| `NEXT_PUBLIC_SITE_URL` | URL canonique publique : `https://www.fabienhance.com` |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Réservé à GA4 ; Analytics n’est pas chargé sans consentement |
 
-Ne jamais placer un jeton privé Strapi dans une variable commençant par `NEXT_PUBLIC_`.
+Les tokens et secrets restent exclusivement côté serveur. Ne jamais les préfixer par
+`NEXT_PUBLIC_` et ne jamais committer `.env.local`.
 
-## Connecter Strapi
+## Strapi
 
-Un projet Strapi est inclus dans le dossier `cms`.
+Le CMS est inclus dans `cms`.
 
 ```bash
+cp cms/.env.example cms/.env
 pnpm cms:dev
 ```
 
-Par défaut :
+L’administration est disponible sur [http://localhost:1337/admin](http://localhost:1337/admin).
 
-- le frontend est disponible sur `http://localhost:3000` ;
-- Strapi est disponible sur `http://localhost:1337`.
-
-### Collection recommandée
-
-Créer une collection `Photo` avec les champs suivants :
+### Collection `Photo`
 
 | Champ | Type | Réglage |
 | --- | --- | --- |
@@ -136,106 +109,101 @@ Créer une collection `Photo` avec les champs suivants :
 | `camera` | Text | Facultatif |
 | `film` | Text | Facultatif |
 
-Dans **Content Manager → Photo**, créer une entrée, sélectionner une image, compléter ses
-informations puis cliquer sur **Publish**.
+Créer une entrée dans **Content Manager → Photo**, sélectionner une image, renseigner son texte
+alternatif dans la médiathèque puis cliquer sur **Publish**. Seules les entrées `Photo` publiées
+sont affichées ; une image isolée dans la Media Library n’est jamais importée automatiquement.
 
-Autoriser `find` et `findOne` pour la collection `Photo`, ou fournir un
-`STRAPI_API_TOKEN` disposant uniquement des droits de lecture nécessaires.
+### Accès privé
 
-### Images de la Media Library
+Le bootstrap révoque les permissions du rôle **Public** et désactive l’inscription publique.
+Créer dans **Settings → API Tokens** un token limité à la lecture de `Photo`, puis le placer dans
+`STRAPI_API_TOKEN`. Le token ne doit pas donner de droit d’écriture ni d’accès à l’administration.
 
-La collection `Photo` reste le mode recommandé, car elle permet de contrôler le titre, le slug,
-le lieu, l’année et les informations techniques.
+En production, utiliser PostgreSQL ou MySQL avec TLS, définir `PUBLIC_URL` en HTTPS et générer des
+valeurs indépendantes et aléatoires pour tous les secrets documentés dans `cms/.env.example`.
 
-Les images présentes uniquement dans la Media Library sont également importées lorsqu’elles ne
-sont associées à aucune entrée `Photo`. Leur titre est déterminé dans cet ordre :
+## Publication et cache
 
-1. `title` ;
-2. texte alternatif ;
-3. légende ;
-4. nom du fichier.
+Les réponses Strapi sont mises en cache pendant 60 secondes. Pour une publication immédiate :
 
-Les réponses Strapi 4 et 5 ainsi que les URLs de médias relatives sont normalisées dans
-`src/lib/cms/strapi.ts`.
-
-## Actualisation du contenu
-
-Les données Strapi sont mises en cache pendant 60 secondes.
-
-Pour déclencher une mise à jour immédiate après une publication :
-
-1. définir `STRAPI_WEBHOOK_SECRET` dans l’environnement du frontend ;
+1. définir le même `STRAPI_WEBHOOK_SECRET` côté frontend et webhook ;
 2. créer un webhook Strapi vers `POST /api/revalidate` ;
-3. ajouter l’en-tête `x-revalidate-secret` ;
-4. utiliser la même valeur secrète des deux côtés.
+3. ajouter l’en-tête `x-revalidate-secret`.
 
-Une requête valide invalide le cache associé au tag `photos`.
+La route refuse les secrets absents ou trop courts et invalide uniquement le tag `photos`.
 
-## SEO et Analytics
+## Builds reproductibles
 
-Le projet génère automatiquement :
+Les commandes de build ignorent Strapi par défaut afin qu’un CMS local ou une URL
+`localhost` ne soit jamais intégrée par erreur dans un artifact de production.
 
-- les métadonnées générales et celles de chaque photographie ;
-- les URL canoniques ;
-- les données Open Graph et Twitter Cards ;
-- une image de partage sociale ;
-- `/robots.txt` ;
-- `/sitemap.xml` ;
-- les données structurées `WebSite` et `Person`.
+```bash
+pnpm build
+pnpm build:hosting
+```
 
-Définir `NEXT_PUBLIC_SITE_URL` avec le domaine final avant le déploiement.
+Pour construire volontairement avec un CMS de production :
 
-Google Analytics n’est pas chargé tant que l’intégration et le consentement ne sont pas activés.
-L’identifiant GA4 sera fourni avec `NEXT_PUBLIC_GA_MEASUREMENT_ID`.
+```bash
+BUILD_WITH_STRAPI=true \
+STRAPI_URL=https://cms.example.com \
+STRAPI_API_TOKEN=your-read-only-token \
+CMS_REQUIRED=true \
+pnpm build:hosting
+```
 
-## Commandes disponibles
+Le vérificateur de bundle contrôle le pont de compatibilité Worker et refuse les URLs de médias
+Strapi locales.
 
-| Commande | Description |
-| --- | --- |
-| `pnpm dev` | Démarre le frontend en développement |
-| `pnpm build` | Crée et valide le build de production |
-| `pnpm build:hosting` | Produit le bundle OpenNext destiné à l’hébergement Cloudflare |
-| `pnpm start` | Démarre le frontend compilé |
-| `pnpm lint` | Analyse le code avec ESLint |
-| `pnpm cms:dev` | Démarre Strapi en développement |
-| `pnpm cms:build` | Compile l’administration Strapi |
+## Qualité et sécurité
 
-## Architecture du projet
+```bash
+pnpm lint
+pnpm typecheck
+pnpm cms:typecheck
+pnpm check
+pnpm cms:build
+```
+
+Le workflow GitHub Actions exécute les contrôles frontend/CMS et le build OpenNext à chaque pull
+request et push sur `master`. Dependabot surveille le frontend, le CMS et les actions GitHub.
+
+Le frontend ajoute notamment une Content Security Policy, bloque l’intégration en iframe,
+désactive `X-Powered-By`, restreint les permissions navigateur et refuse une URL Strapi HTTP en
+production. HSTS doit être activé uniquement lorsque l’apex et `www` répondent tous deux
+définitivement en HTTPS.
+
+## Architecture
 
 ```text
 .
-├── cms/                  # Projet Strapi
-├── public/               # Ressources statiques
+├── cms/                         # Strapi 5
+├── public/                      # Assets statiques
+├── scripts/                     # Builds et vérifications de production
 ├── src/
-│   ├── app/              # Routes, layouts, SEO et endpoints
-│   ├── components/       # Composants d’interface
-│   ├── content/          # Contenu photographique local de secours
+│   ├── app/                     # Routes, SEO et endpoint de revalidation
+│   ├── components/
+│   │   └── PhotoGrid/           # Contrôleurs pointeur, tactile et couleurs
+│   ├── content/                 # Photographies locales de secours
 │   ├── lib/
-│   │   └── cms/          # Accès et normalisation des données Strapi
-│   ├── styles/           # Styles globaux et breakpoints
-│   └── types/            # Contrats de contenu partagés
-├── .env.example          # Variables d’environnement documentées
-└── pnpm-workspace.yaml   # Workspace frontend et CMS
+│   │   └── cms/                 # Accès et normalisation Strapi
+│   ├── styles/                  # Base visuelle et breakpoints
+│   └── types/                   # Contrats de contenu
+├── .env.example
+└── wrangler.jsonc
 ```
 
 ## Déploiement
 
-Avant la mise en production :
+Avant une mise en production :
 
-1. configurer les variables d’environnement ;
-2. rendre Strapi accessible depuis le serveur Next.js ;
-3. vérifier les permissions en lecture de l’API ;
-4. définir le domaine canonique avec `NEXT_PUBLIC_SITE_URL` ;
-5. exécuter les validations :
+1. exécuter `pnpm check`, `pnpm cms:build` et `pnpm build:hosting` ;
+2. définir l’URL canonique et les secrets dans la plateforme, jamais dans Git ;
+3. connecter le token Strapi en lecture seule et activer `CMS_REQUIRED=true` ;
+4. publier uniquement l’artifact produit par OpenNext ;
+5. vérifier `https://www.fabienhance.com`, la redirection de l’apex et
+   `https://cms.fabienhance.com`.
 
-```bash
-pnpm lint
-pnpm build
-pnpm cms:build
-```
-
-Le frontend utilise l’adaptateur OpenNext officiel pour générer un Worker Cloudflare compatible
-avec les routes App Router, le rendu serveur et l’optimisation des images. L’archive de
-déploiement doit conserver les dépendances serveur produites par OpenNext ainsi que
-`wrangler.jsonc`, qui active la compatibilité Node requise par Next.js. La commande
-`build:hosting` applique également le pont CommonJS requis par l’hébergement managé.
+`wrangler.jsonc` active la compatibilité Node requise par Next.js. Le script
+`scripts/patch-open-next-worker.mjs` ajoute le pont CommonJS nécessaire à l’hébergement Workers
+managé.

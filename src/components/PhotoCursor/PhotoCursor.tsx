@@ -2,24 +2,36 @@
 
 import gsap from "gsap";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./PhotoCursor.module.scss";
 
 export function PhotoCursor() {
   const cursor = useRef<HTMLSpanElement>(null);
   const pathname = usePathname();
+  const [hasPrecisePointer, setHasPrecisePointer] = useState(false);
+
+  useEffect(() => {
+    const capability = window.matchMedia("(any-hover: hover) and (any-pointer: fine)");
+    const syncCapability = () => setHasPrecisePointer(capability.matches);
+
+    syncCapability();
+    capability.addEventListener("change", syncCapability);
+    return () => capability.removeEventListener("change", syncCapability);
+  }, []);
 
   useEffect(() => {
     const element = cursor.current;
-    if (
-      !element
-      || !window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches
-    ) return;
+    if (!element || !hasPrecisePointer) return;
+
+    const root = document.documentElement;
+    root.dataset.customCursorReady = "true";
 
     if (pathname.startsWith("/photo/")) {
       gsap.killTweensOf(element);
       gsap.set(element, { autoAlpha: 0, scale: 0.72 });
-      return;
+      return () => {
+        delete root.dataset.customCursorReady;
+      };
     }
 
     const moveX = gsap.quickTo(element, "x", { duration: 0.22, ease: "power3.out" });
@@ -117,6 +129,7 @@ export function PhotoCursor() {
 
     return () => {
       hideCall?.kill();
+      gsap.killTweensOf(element);
       window.cancelAnimationFrame(scrollFrame);
       window.removeEventListener("pointermove", track);
       window.removeEventListener("pointerover", track);
@@ -128,8 +141,9 @@ export function PhotoCursor() {
       window.removeEventListener("focus", syncAfterScroll);
       window.removeEventListener("blur", suspend);
       document.documentElement.removeEventListener("pointerleave", leaveViewport);
+      delete root.dataset.customCursorReady;
     };
-  }, [pathname]);
+  }, [hasPrecisePointer, pathname]);
 
   return <span className={styles.cursor} ref={cursor} aria-hidden="true" />;
 }

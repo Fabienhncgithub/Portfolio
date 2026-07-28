@@ -32,7 +32,7 @@
   font-size: clamp(1.4rem, 2.5vw, 2.5rem);
 }
 
-@include bp.mobile {
+@include bp.compact {
   .contactPage {
     padding-block: 6rem 8rem;
     overflow-x: hidden;
@@ -48,14 +48,20 @@
   }
 }
 
+@include bp.laptop {
+  .contactPage {
+    padding-top: 13rem;
+  }
+}
+
 @include bp.desktop {
   .contactPage {
-    padding-top: 9rem;
+    padding-top: 13rem;
   }
 }
 
 @include bp.wide {
   .contactPage {
-    padding-block: 10rem 15rem;
+    padding-block: 13rem 15rem;
   }
 }

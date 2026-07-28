@@ -20,15 +20,16 @@
   --photo-ratio: 3 / 4;
 }
 
-@include bp.mobile {
-  .archiveGrid {
-    columns: 1;
-  }
+.emptyState {
+  padding-block: min(24vh, 12rem);
+  color: var(--color-muted);
+  font-size: 11px;
+  text-align: center;
 }
 
-@include bp.tablet {
+@include bp.compact {
   .archiveGrid {
-    columns: 2;
+    columns: 1;
   }
 }
 

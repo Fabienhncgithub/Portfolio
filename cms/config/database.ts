@@ -4,11 +4,33 @@ import { isDatabaseClientKind } from '@strapi/database';
 
 const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Database => {
   const client = env('DATABASE_CLIENT', 'sqlite');
+  const isProduction = env('NODE_ENV') === 'production';
 
   if (!isDatabaseClientKind(client)) {
     throw new Error(
       `Unsupported DATABASE_CLIENT: ${client}. Use "postgres", "mysql", or "sqlite".`
     );
+  }
+
+  if (isProduction && client === 'sqlite') {
+    throw new Error('SQLite is not supported in production. Configure PostgreSQL or MySQL.');
+  }
+
+  const hasDiscreteCredentials =
+    Boolean(env('DATABASE_HOST'))
+    && Boolean(env('DATABASE_NAME'))
+    && Boolean(env('DATABASE_USERNAME'))
+    && Boolean(env('DATABASE_PASSWORD'));
+  const hasSupportedDatabaseUrl =
+    client === 'postgres' && Boolean(env('DATABASE_URL'));
+
+  if (
+    isProduction
+    && client !== 'sqlite'
+    && !hasSupportedDatabaseUrl
+    && !hasDiscreteCredentials
+  ) {
+    throw new Error('Production database credentials are incomplete.');
   }
 
   const connections: Record<Core.Config.Database.ClientKind, Core.Config.Database['connection']> = {

@@ -16,20 +16,26 @@
   }
 }
 
-@include bp.mobile {
+@include bp.compact {
   .archivePage {
     padding-block: 6rem 8rem;
   }
 }
 
+@include bp.laptop {
+  .archivePage {
+    padding-top: 13rem;
+  }
+}
+
 @include bp.desktop {
   .archivePage {
-    padding-top: 9rem;
+    padding-top: 13rem;
   }
 }
 
 @include bp.wide {
   .archivePage {
-    padding-block: 10rem 15rem;
+    padding-block: 13rem 15rem;
   }
 }

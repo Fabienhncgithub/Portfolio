@@ -1,0 +1,29 @@
+www.fabienhance.com {
+    encode zstd gzip
+    reverse_proxy portfolio-web:3000
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        -Server
+    }
+}
+
+cms.fabienhance.com {
+    encode zstd gzip
+
+    request_body {
+        max_size 25MB
+    }
+
+    reverse_proxy portfolio-cms:1337
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        X-Frame-Options "SAMEORIGIN"
+        -Server
+    }
+}

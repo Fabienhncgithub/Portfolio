@@ -2,7 +2,13 @@ import type { Photo, PhotoCategory } from "@/types/content";
 
 type UnknownRecord = Record<string, unknown>;
 
-const cmsUrl = process.env.STRAPI_URL ?? process.env.NEXT_PUBLIC_STRAPI_URL;
+const cmsPublicUrl = process.env.STRAPI_URL?.trim();
+const cmsApiUrl = process.env.STRAPI_INTERNAL_URL?.trim() || cmsPublicUrl;
+const apiToken = process.env.STRAPI_API_TOKEN?.trim();
+const photoCategories = new Set<PhotoCategory>(["Landscape", "City", "Travel", "Details"]);
+const pageSize = 100;
+const maxPages = 20;
+const maxResponseBytes = 5 * 1024 * 1024;
 
 function record(value: unknown): UnknownRecord | undefined {
   return value && typeof value === "object" ? (value as UnknownRecord) : undefined;
@@ -16,9 +22,44 @@ function number(value: unknown) {
   return typeof value === "number" && Number.isFinite(value) ? value : undefined;
 }
 
+function positiveNumber(value: unknown) {
+  const candidate = number(value);
+  return candidate && candidate > 0 ? candidate : undefined;
+}
+
+function positiveInteger(value: unknown) {
+  const candidate = positiveNumber(value);
+  return candidate && Number.isInteger(candidate) ? candidate : undefined;
+}
+
+function boundedText(value: unknown, maxLength: number) {
+  const candidate = text(value);
+  return candidate && candidate.length <= maxLength ? candidate : undefined;
+}
+
+function photoCategory(value: unknown): PhotoCategory {
+  const candidate = text(value) as PhotoCategory | undefined;
+  return candidate && photoCategories.has(candidate) ? candidate : "Details";
+}
+
+function isoDate(value: unknown) {
+  const candidate = text(value);
+  return candidate && Number.isFinite(Date.parse(candidate)) ? candidate : undefined;
+}
+
 function absoluteMediaUrl(url: string) {
-  if (/^https?:\/\//.test(url)) return url;
-  return cmsUrl ? new URL(url, cmsUrl).toString() : url;
+  if (!cmsPublicUrl) return;
+
+  try {
+    const cmsOrigin = new URL(cmsPublicUrl);
+    const mediaUrl = new URL(url, cmsOrigin);
+    if (mediaUrl.origin !== cmsOrigin.origin) return;
+    if (!["http:", "https:"].includes(mediaUrl.protocol)) return;
+
+    return mediaUrl.toString();
+  } catch {
+    return;
+  }
 }
 
 function mediaAttributes(value: unknown): UnknownRecord | undefined {
@@ -27,104 +68,119 @@ function mediaAttributes(value: unknown): UnknownRecord | undefined {
   return record(data?.attributes) ?? data ?? root;
 }
 
+async function readJsonWithLimit(response: Response) {
+  const declaredLength = Number(response.headers.get("content-length") ?? 0);
+  if (declaredLength > maxResponseBytes) {
+    throw new Error("Strapi response exceeded the allowed size.");
+  }
+
+  if (!response.body) return response.json();
+
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      totalBytes += value.byteLength;
+      if (totalBytes > maxResponseBytes) {
+        await reader.cancel();
+        throw new Error("Strapi response exceeded the allowed size.");
+      }
+
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  const bytes = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+
+  return JSON.parse(new TextDecoder().decode(bytes)) as unknown;
+}
+
 function normalizePhoto(entry: unknown): Photo | undefined {
   const root = record(entry);
   const fields = record(root?.attributes) ?? root;
   const media = mediaAttributes(fields?.image);
   const imageUrl = text(media?.url);
-  const slug = text(fields?.slug);
-  const title = text(fields?.title);
+  const absoluteImageUrl = imageUrl ? absoluteMediaUrl(imageUrl) : undefined;
+  const slug = boundedText(fields?.slug, 120);
+  const title = boundedText(fields?.title, 160);
+  const year = positiveInteger(fields?.year);
 
-  if (!fields || !imageUrl || !slug || !title) return;
+  if (!fields || !absoluteImageUrl || !slug || !title || !/^[a-z0-9][a-z0-9-]*$/i.test(slug)) return;
 
   return {
     slug,
     title,
-    location: text(fields.location) ?? "",
-    year: number(fields.year) ?? new Date().getFullYear(),
-    category: (text(fields.category) ?? "Details") as PhotoCategory,
-    image: absoluteMediaUrl(imageUrl),
-    width: number(media?.width) ?? number(fields.width) ?? 1600,
-    height: number(media?.height) ?? number(fields.height) ?? 1200,
-    camera: text(fields.camera),
-    film: text(fields.film),
+    alt: boundedText(media?.alternativeText, 500) ?? title,
+    location: boundedText(fields.location, 160) ?? "",
+    year: year && year >= 1900 && year <= 2100 ? year : undefined,
+    category: photoCategory(fields.category),
+    image: absoluteImageUrl,
+    width: positiveNumber(media?.width) ?? positiveNumber(fields.width) ?? 1600,
+    height: positiveNumber(media?.height) ?? positiveNumber(fields.height) ?? 1200,
+    camera: boundedText(fields.camera, 160),
+    film: boundedText(fields.film, 160),
+    updatedAt: isoDate(fields.updatedAt),
   };
 }
 
-function normalizeMedia(entry: unknown): Photo | undefined {
-  const media = record(entry);
-  if (!media) return;
-
-  const url = text(media?.url);
-  const name = text(media?.name);
-  const id = text(media?.documentId) ?? String(media?.id ?? "");
-
-  if (!url || !name || !id || !text(media?.mime)?.startsWith("image/")) return;
-
-  const createdAt = text(media.createdAt);
-  const mediaTitle = text(media.title)
-    ?? text(media.alternativeText)
-    ?? text(media.caption)
-    ?? name.replace(/\.[^.]+$/, "");
-
-  return {
-    slug: `media-${id}`,
-    title: mediaTitle,
-    location: "",
-    year: createdAt ? new Date(createdAt).getFullYear() : new Date().getFullYear(),
-    category: "Details",
-    image: absoluteMediaUrl(url),
-    width: number(media.width) ?? 1600,
-    height: number(media.height) ?? 1200,
-  };
-}
-
-export async function fetchStrapiPhotos(): Promise<Photo[] | undefined> {
-  if (!cmsUrl) return;
-
-  const photosUrl = new URL("/api/photos", cmsUrl);
+async function fetchPhotoPage(page: number) {
+  const photosUrl = new URL("/api/photos", cmsApiUrl);
   photosUrl.searchParams.set("populate", "image");
+  photosUrl.searchParams.set("status", "published");
+  photosUrl.searchParams.set("pagination[page]", String(page));
+  photosUrl.searchParams.set("pagination[pageSize]", String(pageSize));
   photosUrl.searchParams.set("sort[0]", "year:desc");
   photosUrl.searchParams.set("sort[1]", "createdAt:desc");
 
-  const mediaUrl = new URL("/api/upload/files", cmsUrl);
-  mediaUrl.searchParams.set("sort", "createdAt:desc");
-  mediaUrl.searchParams.set("pagination[pageSize]", "100");
+  const response = await fetch(photosUrl, {
+    headers: apiToken ? { Authorization: `Bearer ${apiToken}` } : undefined,
+    next: { revalidate: 60, tags: ["photos"] },
+    redirect: "error",
+    signal: AbortSignal.timeout(5_000),
+  });
 
-  const request = (url: URL) =>
-    fetch(url, {
-      headers: process.env.STRAPI_API_TOKEN
-        ? { Authorization: `Bearer ${process.env.STRAPI_API_TOKEN}` }
-        : undefined,
-      next: { revalidate: 60, tags: ["photos"] },
-    });
-
-  const [photosResponse, mediaResponse] = await Promise.all([
-    request(photosUrl),
-    request(mediaUrl),
-  ]);
-
-  if (!photosResponse.ok || !mediaResponse.ok) {
-    throw new Error(
-      `Strapi request failed (photos: ${photosResponse.status}, media: ${mediaResponse.status})`,
-    );
+  if (!response.ok) {
+    throw new Error(`Strapi request failed (photos: ${response.status})`);
   }
 
-  const photosPayload = record(await photosResponse.json());
-  const photoEntries = Array.isArray(photosPayload?.data) ? photosPayload.data : [];
+  const payload = record(await readJsonWithLimit(response));
+  const entries = Array.isArray(payload?.data) ? payload.data : [];
+  const meta = record(payload?.meta);
+  const pagination = record(meta?.pagination);
+  const pageCount = positiveInteger(pagination?.pageCount) ?? 1;
+
+  return { entries, pageCount };
+}
+
+export async function fetchStrapiPhotos(): Promise<Photo[] | undefined> {
+  if (!cmsApiUrl || !cmsPublicUrl) return;
+
+  const firstPage = await fetchPhotoPage(1);
+  if (firstPage.pageCount > maxPages) {
+    throw new Error(`Strapi returned more than ${maxPages * pageSize} photos.`);
+  }
+
+  const photoEntries = [...firstPage.entries];
+  for (let page = 2; page <= firstPage.pageCount; page += 1) {
+    const result = await fetchPhotoPage(page);
+    photoEntries.push(...result.entries);
+  }
   const photos = photoEntries.flatMap((entry) => {
     const photo = normalizePhoto(entry);
     return photo ? [photo] : [];
   });
 
-  const mediaPayload = await mediaResponse.json();
-  const mediaEntries = Array.isArray(mediaPayload) ? mediaPayload : [];
-  const usedImages = new Set(photos.map((photo) => photo.image));
-  const orphanMedia = mediaEntries.flatMap((entry) => {
-    const photo = normalizeMedia(entry);
-    return photo && !usedImages.has(photo.image) ? [photo] : [];
-  });
-
-  const portfolio = [...photos, ...orphanMedia];
-  return portfolio.length ? portfolio : undefined;
+  return photos;
 }

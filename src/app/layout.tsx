@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    locale: "fr_CH",
+    locale: "en_GB",
     url: "/",
     siteName,
     title: "Fabien Hance — Photographer",
@@ -55,7 +55,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         url: absoluteUrl(),
         name: siteName,
         description: siteDescription,
-        inLanguage: "fr",
+        inLanguage: "en",
       },
       {
         "@type": "Person",
@@ -68,7 +68,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   };
 
   return (
-    <html lang="fr">
+    <html lang="en">
       <body>
         <script
           dangerouslySetInnerHTML={{

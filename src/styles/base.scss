@@ -3,7 +3,7 @@
 :root {
   --color-paper: #f7f6f2;
   --color-ink: #181817;
-  --color-muted: #767570;
+  --color-muted: #6b6a65;
   --content-width: 2560px;
   --page-gutter: clamp(1.25rem, 3vw, 3.5rem);
   --grid-gap: 20px;
@@ -36,9 +36,26 @@ a {
   text-decoration: none;
 }
 
+:where(a, button, [tabindex]):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
 button {
   color: inherit;
   font: inherit;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  border: 0;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 figure,
@@ -52,7 +69,7 @@ footer {
   margin-inline: auto;
   padding: 4rem var(--page-gutter) 2rem;
   color: var(--color-muted);
-  font-size: 9px;
+  font-size: 11px;
 }
 
 body:has([data-photo-page]) > footer {

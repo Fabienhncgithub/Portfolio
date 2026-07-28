@@ -5,8 +5,18 @@ import gsap from "gsap";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import type { ReactNode } from "react";
 import { useRef } from "react";
+import {
+  readGalleryReturnState,
+  removeGalleryReturnState,
+} from "@/lib/galleryReturnState";
+import {
+  getSessionItem,
+  setSessionItem,
+} from "@/lib/sessionStorage";
 
 gsap.registerPlugin(useGSAP, ScrollToPlugin);
+
+const entranceStorageKey = "gallery-entrance-played";
 
 export function GalleryEntrance({ children }: { children: ReactNode }) {
   const gallery = useRef<HTMLDivElement>(null);
@@ -16,79 +26,119 @@ export function GalleryEntrance({ children }: { children: ReactNode }) {
     if (!root) return;
 
     let entrance: gsap.core.Tween | undefined;
-    let animationFrame = 0;
+    let entranceFrame = 0;
+    let positionFrame = 0;
     const previousScrollRestoration = history.scrollRestoration;
     const previousScrollBehavior = document.documentElement.style.scrollBehavior;
     history.scrollRestoration = "manual";
     document.documentElement.style.scrollBehavior = "auto";
 
-    const savedReturn = sessionStorage.getItem("gallery-return-state");
-    if (savedReturn) {
-      try {
-        const state = JSON.parse(savedReturn) as {
-          at: number;
-          scrollY: number;
-          slug: string;
+    const returnState = readGalleryReturnState();
+    if (returnState) {
+      const tile = root.querySelector<HTMLElement>(
+        `[data-photo-slug="${CSS.escape(returnState.slug)}"]`,
+      );
+      if (tile) {
+        positionFrame = window.requestAnimationFrame(() => {
+          const bounds = tile.getBoundingClientRect();
+          const topInset =
+            root.querySelector<HTMLElement>("[data-gallery-header]")
+              ?.getBoundingClientRect().bottom
+            ?? 0;
+          const centeredScroll = window.scrollY
+            + bounds.top
+            - topInset
+            - ((window.innerHeight - topInset - bounds.height) / 2);
+          const maxScroll = Math.max(
+            0,
+            document.documentElement.scrollHeight - window.innerHeight,
+          );
+          const target = Number.isFinite(centeredScroll)
+            ? Math.min(maxScroll, Math.max(0, centeredScroll))
+            : returnState.scrollY;
+
+          window.scrollTo(0, target);
+          removeGalleryReturnState();
+          history.scrollRestoration = previousScrollRestoration;
+          document.documentElement.style.scrollBehavior = previousScrollBehavior;
+        });
+
+        return () => {
+          window.cancelAnimationFrame(positionFrame);
+          history.scrollRestoration = previousScrollRestoration;
+          document.documentElement.style.scrollBehavior = previousScrollBehavior;
         };
-
-        if (
-          Date.now() - state.at < 30 * 60 * 1000
-          && Number.isFinite(state.scrollY)
-          && root.querySelector(`[data-photo-slug="${CSS.escape(state.slug)}"]`)
-        ) {
-          animationFrame = window.requestAnimationFrame(() => {
-            window.scrollTo(0, state.scrollY);
-            sessionStorage.removeItem("gallery-return-state");
-            history.scrollRestoration = previousScrollRestoration;
-            document.documentElement.style.scrollBehavior = previousScrollBehavior;
-          });
-
-          return () => {
-            window.cancelAnimationFrame(animationFrame);
-            history.scrollRestoration = previousScrollRestoration;
-            document.documentElement.style.scrollBehavior = previousScrollBehavior;
-          };
-        }
-      } catch {
-        // Ignore an invalid or outdated restoration payload.
       }
-
-      sessionStorage.removeItem("gallery-return-state");
     }
+    removeGalleryReturnState();
 
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      window.scrollTo({ top: 0 });
+    if (getSessionItem(entranceStorageKey)) {
       history.scrollRestoration = previousScrollRestoration;
       document.documentElement.style.scrollBehavior = previousScrollBehavior;
       return;
     }
 
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      window.scrollTo({ top: 0 });
+      setSessionItem(entranceStorageKey, "true");
+      history.scrollRestoration = previousScrollRestoration;
+      document.documentElement.style.scrollBehavior = previousScrollBehavior;
+      return;
+    }
+
+    const interruptionEvents = ["wheel", "touchstart", "pointerdown", "keydown"] as const;
+    const removeInterruptionListeners = () => {
+      interruptionEvents.forEach((eventName) => {
+        window.removeEventListener(eventName, interruptEntrance);
+      });
+    };
+    const restoreBrowserBehavior = () => {
+      delete document.documentElement.dataset.galleryEntering;
+      removeInterruptionListeners();
+      history.scrollRestoration = previousScrollRestoration;
+      document.documentElement.style.scrollBehavior = previousScrollBehavior;
+    };
+    const interruptEntrance = () => {
+      window.cancelAnimationFrame(entranceFrame);
+      entrance?.kill();
+      restoreBrowserBehavior();
+    };
+
     const positionAtBottom = () => {
       const bottom = Math.max(0, root.offsetTop + root.scrollHeight - window.innerHeight);
-      window.scrollTo(0, bottom);
+      const start = Math.min(bottom, window.innerHeight * 0.9);
+      if (start <= 1) {
+        setSessionItem(entranceStorageKey, "true");
+        restoreBrowserBehavior();
+        return;
+      }
 
-      // A painted frame at the bottom makes the full upward movement perceptible.
-      animationFrame = window.requestAnimationFrame(() => {
+      document.documentElement.dataset.galleryEntering = "true";
+      window.scrollTo(0, start);
+      setSessionItem(entranceStorageKey, "true");
+
+      interruptionEvents.forEach((eventName) => {
+        window.addEventListener(eventName, interruptEntrance, { once: true, passive: true });
+      });
+
+      entranceFrame = window.requestAnimationFrame(() => {
         entrance = gsap.to(window, {
-          scrollTo: { y: 0, autoKill: false },
+          scrollTo: { y: 0, autoKill: true },
           duration: 1,
           ease: "power2.inOut",
-          onComplete: () => {
-            history.scrollRestoration = previousScrollRestoration;
-            document.documentElement.style.scrollBehavior = previousScrollBehavior;
-          },
+          onComplete: restoreBrowserBehavior,
+          onInterrupt: restoreBrowserBehavior,
         });
       });
     };
 
-    // Wait for Next.js scroll restoration, then take control immediately.
-    animationFrame = window.requestAnimationFrame(positionAtBottom);
+    positionFrame = window.requestAnimationFrame(positionAtBottom);
 
     return () => {
-      window.cancelAnimationFrame(animationFrame);
+      window.cancelAnimationFrame(positionFrame);
+      window.cancelAnimationFrame(entranceFrame);
       entrance?.kill();
-      history.scrollRestoration = previousScrollRestoration;
-      document.documentElement.style.scrollBehavior = previousScrollBehavior;
+      restoreBrowserBehavior();
     };
   }, { scope: gallery });
 

@@ -1,0 +1,38 @@
+FROM node:22-alpine AS dependencies
+WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@10.15.1 --activate
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY cms/package.json ./cms/package.json
+RUN pnpm install --filter photography-portfolio-cms... --frozen-lockfile
+
+FROM dependencies AS build
+WORKDIR /app/cms
+COPY cms/ ./
+ENV NODE_ENV=production
+ENV PUBLIC_URL=https://cms.fabienhance.com
+ENV CORS_ORIGINS=https://www.fabienhance.com
+ENV APP_KEYS=build-only-app-key-000000000000000000000000000001,build-only-app-key-000000000000000000000000000002
+ENV API_TOKEN_SALT=build-only-api-token-salt-000000000000000000000000
+ENV ADMIN_JWT_SECRET=build-only-admin-jwt-secret-000000000000000000000
+ENV TRANSFER_TOKEN_SALT=build-only-transfer-token-salt-00000000000000000
+ENV JWT_SECRET=build-only-jwt-secret-000000000000000000000000000
+ENV ENCRYPTION_KEY=build-only-encryption-key-000000000000000000000000
+ENV DATABASE_CLIENT=postgres
+ENV DATABASE_HOST=postgres
+ENV DATABASE_NAME=photography
+ENV DATABASE_USERNAME=photography
+ENV DATABASE_PASSWORD=build-only-database-password
+ENV DATABASE_SSL=false
+RUN pnpm build
+
+FROM node:22-alpine AS runtime
+WORKDIR /app/cms
+ENV NODE_ENV=production
+RUN corepack enable \
+  && corepack prepare pnpm@10.15.1 --activate \
+  && addgroup --system --gid 1001 strapi \
+  && adduser --system --uid 1001 strapi
+COPY --from=build --chown=strapi:strapi /app /app
+USER strapi
+EXPOSE 1337
+CMD ["pnpm", "start"]
