@@ -229,6 +229,24 @@ Avant une mise en production :
 5. vérifier `https://www.fabienhance.com`, la redirection de l’apex et
    `https://cms.fabienhance.com`.
 
+### Persistance et sauvegardes
+
+PostgreSQL et les uploads Strapi utilisent des volumes Docker externes :
+`photography-portfolio_postgres-data` et `photography-portfolio_strapi-uploads`.
+Compose peut reconstruire ou supprimer ses conteneurs sans supprimer ces volumes.
+
+Sur le VPS, toujours déployer avec :
+
+```bash
+cd /opt/photography-portfolio
+./deploy/deploy-production.sh
+```
+
+Le script valide la configuration, sauvegarde PostgreSQL et les médias dans
+`/var/backups/photography-portfolio`, puis reconstruit les conteneurs. Les archives sont privées,
+accompagnées de sommes SHA-256 et conservées pendant 30 jours. Ne jamais utiliser
+`docker volume rm` sur les deux volumes de production.
+
 `wrangler.jsonc` active la compatibilité Node requise par Next.js. Le script
 `scripts/patch-open-next-worker.mjs` ajoute le pont CommonJS nécessaire à l’hébergement Workers
 managé.

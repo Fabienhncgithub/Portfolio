@@ -107,4 +107,8 @@ networks:
 
 volumes:
   postgres-data:
+    external: true
+    name: photography-portfolio_postgres-data
   strapi-uploads:
+    external: true
+    name: photography-portfolio_strapi-uploads
