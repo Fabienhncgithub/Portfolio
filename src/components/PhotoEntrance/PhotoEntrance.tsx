@@ -146,6 +146,8 @@ export function PhotoEntrance({
       <Link
         aria-label="Back to all photographs"
         className={`${className ?? ""} ${styles.photoLink}`}
+        data-analytics-event="gallery_return"
+        data-analytics-method="image"
         href="/"
         onMouseEnter={(event) => {
           moveCloseCursor(event, true);

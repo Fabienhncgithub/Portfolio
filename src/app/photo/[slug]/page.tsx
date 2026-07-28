@@ -87,6 +87,8 @@ export default async function PhotoPage({
       <Link
         aria-label="Close the photograph and return to the gallery"
         className={styles.closePhoto}
+        data-analytics-event="gallery_return"
+        data-analytics-method="close"
         href="/"
       >
         <span aria-hidden="true" />
@@ -108,11 +110,23 @@ export default async function PhotoPage({
       <nav className={styles.pagination} aria-label="Adjacent photographs">
         {hasAdjacentPhotos && (
           <span className={styles.adjacent}>
-            <Link className={styles.previous} href={`/photo/${previous.slug}`}>
+            <Link
+              className={styles.previous}
+              data-analytics-direction="previous"
+              data-analytics-event="photo_navigation"
+              data-analytics-photo-slug={previous.slug}
+              href={`/photo/${previous.slug}`}
+            >
               <span aria-hidden="true">←</span>
               Previous
             </Link>
-            <Link className={styles.next} href={`/photo/${next.slug}`}>
+            <Link
+              className={styles.next}
+              data-analytics-direction="next"
+              data-analytics-event="photo_navigation"
+              data-analytics-photo-slug={next.slug}
+              href={`/photo/${next.slug}`}
+            >
               Next
               <span aria-hidden="true">→</span>
             </Link>

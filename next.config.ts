@@ -31,12 +31,12 @@ function getStrapiMediaPattern() {
 
 const strapiMediaPattern = getStrapiMediaPattern();
 const scriptSources = process.env.NODE_ENV === "development"
-  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-  : "script-src 'self' 'unsafe-inline'";
+  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com"
+  : "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com";
 const contentSecurityPolicy = [
   "default-src 'self'",
   "base-uri 'self'",
-  "connect-src 'self'",
+  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com",
   "font-src 'self' data:",
   "form-action 'self'",
   "frame-ancestors 'none'",

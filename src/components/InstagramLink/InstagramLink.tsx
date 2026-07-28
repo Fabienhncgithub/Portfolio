@@ -3,6 +3,8 @@ export function InstagramLink({ className = "" }: { className?: string }) {
     <a
       className={className}
       aria-label="Instagram"
+      data-analytics-destination="instagram"
+      data-analytics-event="outbound_click"
       href="https://www.instagram.com/fabien_hnc/"
       rel="noreferrer"
       target="_blank"

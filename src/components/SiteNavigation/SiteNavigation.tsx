@@ -15,6 +15,8 @@ export function SiteNavigation() {
         aria-current={pathname === "/" ? "page" : undefined}
         aria-label="Fabien Hance, home"
         className={styles.wordmark}
+        data-analytics-destination="gallery"
+        data-analytics-event="navigation_click"
         href="/"
       >
         <strong><span>Fabien</span><span>Hance</span></strong>
@@ -23,6 +25,8 @@ export function SiteNavigation() {
         <Link
           aria-current={pathname === "/about" ? "page" : undefined}
           className={styles.aboutLink}
+          data-analytics-destination="about"
+          data-analytics-event="navigation_click"
           href="/about"
         >
           About

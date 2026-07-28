@@ -40,6 +40,9 @@ export function PhotoTile({
       <Link
         href={`/photo/${photo.slug}`}
         aria-label={`View ${photo.title}`}
+        data-analytics-event="photo_open"
+        data-analytics-photo-slug={photo.slug}
+        data-analytics-photo-title={photo.title}
         data-photo-interactive
         data-photo-slug={photo.slug}
         onBlur={onPreviewEnd}

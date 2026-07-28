@@ -1,4 +1,8 @@
 import type { Metadata } from "next";
+import {
+  Analytics,
+  AnalyticsPreferencesButton,
+} from "@/components/Analytics/Analytics";
 import { PhotoCursor } from "@/components/PhotoCursor/PhotoCursor";
 import { SiteNavigation } from "@/components/SiteNavigation/SiteNavigation";
 import { absoluteUrl, siteDescription, siteName, siteUrl } from "@/lib/site";
@@ -46,6 +50,16 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const configuredMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim();
+  if (
+    configuredMeasurementId
+    && !/^G-[A-Z0-9]+$/.test(configuredMeasurementId)
+  ) {
+    throw new Error("NEXT_PUBLIC_GA_MEASUREMENT_ID must use the G-XXXXXXXXXX format.");
+  }
+  const measurementId = configuredMeasurementId && /^G-[A-Z0-9]+$/.test(configuredMeasurementId)
+    ? configuredMeasurementId
+    : undefined;
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -81,7 +95,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <main>{children}</main>
         <footer>
           <span>© {new Date().getFullYear()} Fabien Hance</span>
+          {measurementId && <AnalyticsPreferencesButton />}
         </footer>
+        <Analytics measurementId={measurementId} />
       </body>
     </html>
   );

@@ -65,6 +65,8 @@ p {
 }
 
 footer {
+  display: flex;
+  justify-content: space-between;
   width: min(100%, var(--content-width));
   margin-inline: auto;
   padding: 4rem var(--page-gutter) 2rem;

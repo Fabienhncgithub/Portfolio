@@ -77,13 +77,38 @@ cp .env.example .env.local
 | --- | --- |
 | `STRAPI_URL` | URL serveur de Strapi, en HTTPS hors développement local |
 | `STRAPI_API_TOKEN` | Token privé en lecture seule, requis lorsque Strapi est connecté |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Identifiant du flux Web GA4 au format `G-XXXXXXXXXX` |
 | `STRAPI_WEBHOOK_SECRET` | Secret aléatoire d’au moins 32 caractères pour la revalidation |
 | `CMS_REQUIRED` | Mettre à `true` en production pour refuser un fallback silencieux |
 | `NEXT_PUBLIC_SITE_URL` | URL canonique publique : `https://www.fabienhance.com` |
-| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Réservé à GA4 ; Analytics n’est pas chargé sans consentement |
 
 Les tokens et secrets restent exclusivement côté serveur. Ne jamais les préfixer par
 `NEXT_PUBLIC_` et ne jamais committer `.env.local`.
+
+## Google Analytics 4
+
+Le tag Google n’est jamais chargé avant un consentement explicite. Les signaux publicitaires,
+la personnalisation et le stockage publicitaire restent désactivés. Le visiteur peut modifier
+son choix via **Analytics settings** dans le pied de page.
+
+Événements mesurés :
+
+| Événement | Utilité |
+| --- | --- |
+| `page_view` | Pages visitées et navigation Next.js |
+| `photo_open` | Photographie ouverte depuis la galerie |
+| `photo_navigation` | Utilisation de Previous ou Next |
+| `gallery_return` | Retour à la galerie par l’image ou le bouton de fermeture |
+| `outbound_click` | Clic vers Instagram |
+| `photo_engagement` | Photographie gardée au premier plan pendant 10 ou 30 secondes |
+
+Dans le flux Web GA4, désactiver **Page changes based on browser history events** pour éviter
+de compter deux fois les pages vues : l’application envoie déjà les changements de route.
+
+Créer ensuite les dimensions personnalisées de portée **Event** :
+`photo_slug`, `photo_title`, `direction`, `method` et `destination`. Créer également la métrique
+personnalisée `engagement_seconds`. Ces données permettent de comparer ouvertures, temps
+d’attention, navigation et sorties Instagram dans **Explore → Free form**.
 
 ## Strapi
 
