@@ -1,9 +1,15 @@
 name: Quality
 
 on:
+  workflow_dispatch:
   pull_request:
+    branches: [develop, master]
   push:
-    branches: [master]
+    branches: [develop, master]
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -22,11 +28,8 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-          cache-dependency-path: |
-            pnpm-lock.yaml
-            cms/pnpm-lock.yaml
+          cache-dependency-path: pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --dir cms install --frozen-lockfile
       - run: pnpm check
       - run: pnpm cms:build
         env:
@@ -38,3 +41,40 @@ jobs:
           JWT_SECRET: ci-jwt-secret-000000000000000000000001
           ENCRYPTION_KEY: ci-encryption-key-00000000000000000001
       - run: pnpm build:hosting
+
+  deploy-development:
+    if: >-
+      github.ref == 'refs/heads/develop'
+      && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: development
+      url: https://dev.fabienhance.com
+    permissions:
+      contents: read
+
+    steps:
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.DEV_SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Deploy validated commit
+        env:
+          SSH_HOST: ${{ secrets.DEV_SSH_HOST }}
+          SSH_PORT: ${{ secrets.DEV_SSH_PORT }}
+          SSH_USER: ${{ secrets.DEV_SSH_USER }}
+        run: |
+          test -n "$SSH_HOST"
+          test -n "$SSH_USER"
+          SSH_PORT="${SSH_PORT:-22}"
+          ssh -i ~/.ssh/id_ed25519 -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
+            "cd /opt/photography-portfolio-dev && ./deploy/deploy-development.sh '$GITHUB_SHA'"

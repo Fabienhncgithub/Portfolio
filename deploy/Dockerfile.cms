@@ -8,9 +8,11 @@ RUN pnpm install --filter photography-portfolio-cms... --frozen-lockfile
 FROM dependencies AS build
 WORKDIR /app/cms
 COPY cms/ ./
+ARG PUBLIC_URL=https://cms.fabienhance.com
+ARG CORS_ORIGINS=https://www.fabienhance.com
 ENV NODE_ENV=production
-ENV PUBLIC_URL=https://cms.fabienhance.com
-ENV CORS_ORIGINS=https://www.fabienhance.com
+ENV PUBLIC_URL=$PUBLIC_URL
+ENV CORS_ORIGINS=$CORS_ORIGINS
 ENV APP_KEYS=build-only-app-key-000000000000000000000000000001,build-only-app-key-000000000000000000000000000002
 ENV API_TOKEN_SALT=build-only-api-token-salt-000000000000000000000000
 ENV ADMIN_JWT_SECRET=build-only-admin-jwt-secret-000000000000000000000

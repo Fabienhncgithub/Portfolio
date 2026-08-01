@@ -50,6 +50,7 @@ The main frontend variables are documented in `.env.example`:
 | Variable | Purpose |
 | --- | --- |
 | `STRAPI_URL` | Public Strapi URL |
+| `STRAPI_MEDIA_URL` | Optional media origin compiled into the image allowlist |
 | `STRAPI_INTERNAL_URL` | Optional private server-to-server URL |
 | `STRAPI_API_TOKEN` | Read-only token for published photos |
 | `STRAPI_WEBHOOK_SECRET` | Secret used by the revalidation webhook |

@@ -1,4 +1,4 @@
-name: photography-portfolio
+name: photography-portfolio-dev
 
 services:
   postgres:
@@ -22,12 +22,15 @@ services:
     build:
       context: ..
       dockerfile: deploy/Dockerfile.cms
+      args:
+        PUBLIC_URL: https://cms-dev.fabienhance.com
+        CORS_ORIGINS: https://dev.fabienhance.com
     restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
     env_file:
-      - ${APP_ENV_FILE:-.env.production}
+      - ${APP_ENV_FILE:-.env.development}
     environment:
       HOST: 0.0.0.0
       PORT: 1337
@@ -58,18 +61,18 @@ services:
       private:
       edge:
         aliases:
-          - portfolio-cms
+          - portfolio-cms-dev
     ports:
-      - "127.0.0.1:1337:1337"
+      - "127.0.0.1:1437:1337"
 
   web:
     build:
       context: ..
       dockerfile: deploy/Dockerfile.web
       args:
-        NEXT_PUBLIC_SITE_URL: https://www.fabienhance.com
+        NEXT_PUBLIC_SITE_URL: https://dev.fabienhance.com
         NEXT_PUBLIC_GA_MEASUREMENT_ID: ${NEXT_PUBLIC_GA_MEASUREMENT_ID:-}
-        STRAPI_MEDIA_URL: https://cms.fabienhance.com
+        STRAPI_MEDIA_URL: https://cms-dev.fabienhance.com
     restart: unless-stopped
     depends_on:
       cms:
@@ -77,8 +80,8 @@ services:
     environment:
       NODE_ENV: production
       NEXT_PUBLIC_GA_MEASUREMENT_ID: ${NEXT_PUBLIC_GA_MEASUREMENT_ID:-}
-      NEXT_PUBLIC_SITE_URL: https://www.fabienhance.com
-      STRAPI_URL: https://cms.fabienhance.com
+      NEXT_PUBLIC_SITE_URL: https://dev.fabienhance.com
+      STRAPI_URL: https://cms-dev.fabienhance.com
       STRAPI_INTERNAL_URL: http://cms:1337
       STRAPI_API_TOKEN: ${STRAPI_API_TOKEN}
       STRAPI_WEBHOOK_SECRET: ${STRAPI_WEBHOOK_SECRET}
@@ -99,9 +102,9 @@ services:
       private:
       edge:
         aliases:
-          - portfolio-web
+          - portfolio-web-dev
     ports:
-      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:3100:3000"
     volumes:
       - next-cache:/app/.next/cache
     security_opt:
@@ -113,13 +116,10 @@ networks:
   private:
     internal: true
   edge:
+    external: true
     name: photography-edge
 
 volumes:
   postgres-data:
-    external: true
-    name: photography-portfolio_postgres-data
   strapi-uploads:
-    external: true
-    name: photography-portfolio_strapi-uploads
   next-cache:

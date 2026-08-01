@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
-const strapiUrl = process.env.STRAPI_URL?.trim();
+const strapiUrl =
+  process.env.STRAPI_MEDIA_URL?.trim()
+  || process.env.STRAPI_URL?.trim();
 
 function getStrapiMediaPattern() {
   if (!strapiUrl) return;
