@@ -5,11 +5,15 @@ import { fetchStrapiPhotos } from "@/lib/cms/strapi";
 export type { Photo, PhotoCategory } from "@/types/content";
 
 const cmsRequired = process.env.CMS_REQUIRED === "true";
-const cmsConfigured = Boolean(process.env.STRAPI_URL?.trim());
+const cmsUrlConfigured = Boolean(process.env.STRAPI_URL?.trim());
+const cmsTokenConfigured = Boolean(process.env.STRAPI_API_TOKEN?.trim());
 
 export const getPhotos = cache(async () => {
-  if (cmsRequired && !cmsConfigured) {
+  if (cmsRequired && !cmsUrlConfigured) {
     throw new Error("CMS_REQUIRED is enabled but STRAPI_URL is not configured.");
+  }
+  if (cmsRequired && !cmsTokenConfigured) {
+    throw new Error("CMS_REQUIRED is enabled but STRAPI_API_TOKEN is not configured.");
   }
 
   try {

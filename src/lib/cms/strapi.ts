@@ -1,9 +1,45 @@
+import "server-only";
 import type { Photo, PhotoCategory } from "@/types/content";
 
 type UnknownRecord = Record<string, unknown>;
 
-const cmsPublicUrl = process.env.STRAPI_URL?.trim();
-const cmsApiUrl = process.env.STRAPI_INTERNAL_URL?.trim() || cmsPublicUrl;
+function validatedCmsUrl(
+  rawValue: string | undefined,
+  label: "STRAPI_INTERNAL_URL" | "STRAPI_URL",
+) {
+  const value = rawValue?.trim();
+  if (!value) return;
+
+  const url = new URL(value);
+  if (url.username || url.password || url.search || url.hash) {
+    throw new Error(`${label} must not contain credentials, a query or a fragment.`);
+  }
+  if (url.pathname !== "/" && url.pathname !== "") {
+    throw new Error(`${label} must use the origin without a path.`);
+  }
+
+  const localDevelopmentUrl =
+    process.env.NODE_ENV === "development"
+    && url.protocol === "http:"
+    && ["localhost", "127.0.0.1"].includes(url.hostname);
+  const privateContainerUrl =
+    label === "STRAPI_INTERNAL_URL"
+    && url.protocol === "http:"
+    && /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i.test(url.hostname);
+
+  if (url.protocol !== "https:" && !localDevelopmentUrl && !privateContainerUrl) {
+    throw new Error(
+      `${label} must use HTTPS, except for local development or a private container hostname.`,
+    );
+  }
+
+  return url.origin;
+}
+
+const cmsPublicUrl = validatedCmsUrl(process.env.STRAPI_URL, "STRAPI_URL");
+const cmsApiUrl =
+  validatedCmsUrl(process.env.STRAPI_INTERNAL_URL, "STRAPI_INTERNAL_URL")
+  || cmsPublicUrl;
 const apiToken = process.env.STRAPI_API_TOKEN?.trim();
 const photoCategories = new Set<PhotoCategory>(["Landscape", "City", "Travel", "Details"]);
 const pageSize = 100;

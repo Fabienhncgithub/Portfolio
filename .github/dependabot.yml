@@ -6,16 +6,7 @@ updates:
     schedule:
       interval: weekly
     groups:
-      frontend:
-        patterns:
-          - "*"
-
-  - package-ecosystem: npm
-    directory: /cms
-    schedule:
-      interval: weekly
-    groups:
-      cms:
+      workspace:
         patterns:
           - "*"
 
