@@ -39,3 +39,19 @@ access to that directory and the Docker commands used by the deployment script.
 After bootstrap, each validated push to `develop` deploys the exact commit SHA, refreshes the
 Next.js content cache and warms the gallery, archive and sitemap. A failed build, missing CMS
 token or failed content refresh stops the workflow.
+
+## Releases
+
+Release Please runs after validated changes reach `master`. Configure a fine-grained token as
+the repository secret `RELEASE_PLEASE_TOKEN` so its release pull requests trigger the normal
+quality checks. The token needs read/write access to contents, pull requests and issues.
+
+Use Conventional Commit titles when squash-merging:
+
+- `fix:` creates a patch release
+- `feat:` creates a minor release
+- `feat!:` or a `BREAKING CHANGE` footer creates a major release
+
+Release Please keeps one release pull request up to date. Merging it updates `CHANGELOG.md` and
+`package.json`, creates a `vX.Y.Z` tag and publishes the GitHub Release. It does not publish the
+private application to npm.

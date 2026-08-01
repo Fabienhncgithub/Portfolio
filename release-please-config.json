@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "bootstrap-sha": "6b1f7d44447bf7b3903fd6ac35cb898aceda43ed",
+  "release-type": "node",
+  "include-v-in-tag": true,
+  "include-component-in-tag": false,
+  "packages": {
+    ".": {
+      "package-name": "fabien-hance-portfolio",
+      "changelog-path": "CHANGELOG.md"
+    }
+  }
+}
