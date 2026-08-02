@@ -22,6 +22,10 @@ Create an environment named `development` with these secrets:
 - `DEV_SSH_PRIVATE_KEY`
 - `DEV_SSH_KNOWN_HOSTS`
 
+Create the repository variable `DEV_DEPLOY_ENABLED` with the value `true` only after the
+development VPS and all five secrets are ready. Until then, pushes to `develop` are validated
+without attempting a deployment.
+
 The development checkout lives at `/opt/photography-portfolio-dev`. The SSH account only needs
 access to that directory and the Docker commands used by the deployment script.
 

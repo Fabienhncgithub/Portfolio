@@ -46,6 +46,7 @@ jobs:
     if: >-
       github.ref == 'refs/heads/develop'
       && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+      && vars.DEV_DEPLOY_ENABLED == 'true'
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 15
