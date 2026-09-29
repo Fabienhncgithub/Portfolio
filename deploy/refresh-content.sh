@@ -28,7 +28,6 @@ async function refresh() {
   });
   await Promise.all([
     request("/"),
-    request("/archive"),
     request("/sitemap.xml"),
   ]);
   console.log("Strapi content revalidated and warmed.");

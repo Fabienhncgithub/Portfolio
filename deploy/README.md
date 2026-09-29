@@ -41,7 +41,7 @@ access to that directory and the Docker commands used by the deployment script.
    token to `.env.development`.
 
 After bootstrap, each validated push to `develop` deploys the exact commit SHA, refreshes the
-Next.js content cache and warms the gallery, archive and sitemap. A failed build, missing CMS
+Next.js content cache and warms the gallery and sitemap. A failed build, missing CMS
 token or failed content refresh stops the workflow.
 
 ## Releases
