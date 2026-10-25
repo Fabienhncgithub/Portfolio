@@ -36,13 +36,25 @@ access to that directory and the Docker commands used by the deployment script.
 3. Copy `deploy/development.env.example` to `deploy/.env.development` and generate independent
    development secrets.
 4. Ensure the shared `photography-edge` Docker network exists.
-5. Load the updated `Caddyfile.portfolio` once on the reverse proxy.
+5. Run `deploy/publish-proxy-site.sh` to load `Caddyfile.portfolio` on the reverse proxy.
 6. Start the development CMS, create its administrator and a read-only API token, then add the
    token to `.env.development`.
 
 After bootstrap, each validated push to `develop` deploys the exact commit SHA, refreshes the
 Next.js content cache and warms the gallery and sitemap. A failed build, missing CMS
 token or failed content refresh stops the workflow.
+
+## Reverse proxy
+
+The FabRun Caddy container is the VPS reverse proxy. It imports every `*.caddy` file from
+`/opt/fabrun/deploy/sites`, so redeploying FabRun keeps this site online. The production
+deploy script copies `Caddyfile.portfolio` there as `portfolio.caddy` and reloads Caddy; if
+Caddy rejects it, the previous file is restored and the deploy stops. Override the defaults
+with `PROXY_SITES_DIRECTORY` and `PROXY_CONTAINER` when needed.
+
+The `Uptime` workflow checks the public sites every 30 minutes and fails when one is
+unreachable or its certificate expires within 14 days. GitHub emails scheduled workflow
+failures to the last person who edited the schedule.
 
 ## Releases
 

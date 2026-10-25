@@ -12,5 +12,6 @@ cd "${project_directory}"
 docker compose --env-file "${environment_file}" -f "${compose_file}" config --quiet
 "${script_directory}/backup-production.sh"
 docker compose --env-file "${environment_file}" -f "${compose_file}" up -d --build
+"${script_directory}/publish-proxy-site.sh"
 "${script_directory}/refresh-content.sh" "${environment_file}" "${compose_file}"
 docker compose --env-file "${environment_file}" -f "${compose_file}" ps
