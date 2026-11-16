@@ -24,12 +24,21 @@ export function SiteNavigation() {
       <nav aria-label="Primary navigation">
         <Link
           aria-current={pathname === "/about" ? "page" : undefined}
-          className={styles.aboutLink}
+          className={styles.navLink}
           data-analytics-destination="about"
           data-analytics-event="navigation_click"
           href="/about"
         >
           About
+        </Link>
+        <Link
+          aria-current={pathname === "/contact" ? "page" : undefined}
+          className={styles.navLink}
+          data-analytics-destination="contact"
+          data-analytics-event="navigation_click"
+          href="/contact"
+        >
+          Contact
         </Link>
       </nav>
       <InstagramLink className={styles.instagramLink} />

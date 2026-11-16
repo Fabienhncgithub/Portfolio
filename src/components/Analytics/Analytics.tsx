@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { getLocalItem, setLocalItem } from "@/lib/localStorage";
 import styles from "./Analytics.module.scss";
 
 const consentStorageKey = "analytics-consent-v1";
@@ -89,7 +90,7 @@ export function Analytics({ measurementId }: { measurementId?: string }) {
   const [ready, setReady] = useState(false);
 
   const applyConsent = useCallback((nextConsent: Consent) => {
-    localStorage.setItem(consentStorageKey, nextConsent);
+    setLocalItem(consentStorageKey, nextConsent);
     setConsent(nextConsent);
     setDialogOpen(false);
 
@@ -104,7 +105,7 @@ export function Analytics({ measurementId }: { measurementId?: string }) {
   useEffect(() => {
     if (!measurementId) return;
 
-    const stored = localStorage.getItem(consentStorageKey);
+    const stored = getLocalItem(consentStorageKey);
     const initialConsent = stored === "granted" || stored === "denied"
       ? stored
       : undefined;
@@ -187,12 +188,7 @@ export function Analytics({ measurementId }: { measurementId?: string }) {
   if (!showDialog) return null;
 
   return (
-    <aside
-      aria-label="Analytics preferences"
-      aria-live="polite"
-      className={styles.consent}
-      role="dialog"
-    >
+    <aside aria-label="Analytics preferences" className={styles.consent}>
       <p>
         Optional analytics help improve which photographs and interactions work best.
       </p>
