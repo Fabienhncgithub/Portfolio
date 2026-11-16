@@ -8,7 +8,7 @@ and desktop navigation.
 
 ## Highlights
 
-- Responsive gallery, archive and immersive photo pages
+- Responsive gallery and immersive photo pages
 - Swipe and keyboard navigation with precise gallery return
 - Optimized AVIF and WebP images
 - Private Strapi content with a local development fallback
@@ -73,10 +73,15 @@ immediately.
 
 ```bash
 pnpm check
+pnpm test
+pnpm test:e2e
 pnpm cms:build
 pnpm build
 pnpm build:hosting
 ```
+
+`test` runs the unit tests. `test:e2e` builds the site with the fallback photographs and
+drives it in Chromium; run `pnpm exec playwright install chromium` once beforehand.
 
 `build:hosting` creates the OpenNext bundle for Cloudflare Workers. Docker and VPS deployment
 files are available in `deploy/`; the production script validates the Compose configuration,

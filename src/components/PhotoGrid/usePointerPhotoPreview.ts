@@ -6,7 +6,7 @@ import type { Photo } from "@/lib/photos";
 import { POINTER_SCROLL_SETTLE_DELAY } from "./constants";
 
 type PointerPhotoPreviewOptions = {
-  grid: RefObject<HTMLElement>;
+  grid: RefObject<HTMLElement | null>;
   photos: Photo[];
   onPreviewEnd: () => void;
   onPreviewStart: (photo: Photo) => void;
@@ -18,7 +18,7 @@ export function usePointerPhotoPreview({
   onPreviewEnd,
   onPreviewStart,
 }: PointerPhotoPreviewOptions) {
-  const pointerPosition = useRef<{ x: number; y: number }>();
+  const pointerPosition = useRef<{ x: number; y: number } | undefined>(undefined);
   const photoBySlug = useMemo(
     () => new Map(photos.map((photo) => [photo.slug, photo])),
     [photos],

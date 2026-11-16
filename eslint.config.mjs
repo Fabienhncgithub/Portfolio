@@ -10,6 +10,8 @@ const config = [
       "cms/dist/**",
       "cms/types/generated/**",
       "next-env.d.ts",
+      "test-results/**",
+      "playwright-report/**",
     ],
   },
   ...compat.extends("next/core-web-vitals", "next/typescript"),

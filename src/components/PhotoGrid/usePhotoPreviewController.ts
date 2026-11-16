@@ -12,9 +12,9 @@ import {
 import { dominantColor } from "./dominantColor";
 
 type PhotoPreviewControllerOptions = {
-  grid: RefObject<HTMLElement>;
-  gridHeader: RefObject<HTMLDivElement>;
-  gridMeta: RefObject<HTMLDivElement>;
+  grid: RefObject<HTMLElement | null>;
+  gridHeader: RefObject<HTMLDivElement | null>;
+  gridMeta: RefObject<HTMLDivElement | null>;
   onActivePhotoChange: (photo: Photo) => void;
 };
 
@@ -28,10 +28,10 @@ export function usePhotoPreviewController({
   gridMeta,
   onActivePhotoChange,
 }: PhotoPreviewControllerOptions) {
-  const activePhoto = useRef<Photo>();
+  const activePhoto = useRef<Photo | undefined>(undefined);
   const activeSlug = useRef("");
   const colorHeaderForActivePhoto = useRef(false);
-  const dwellTimer = useRef<ReturnType<typeof setTimeout>>();
+  const dwellTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const previewWasRevealed = useRef(false);
   const titleAnimationFrame = useRef(0);
 

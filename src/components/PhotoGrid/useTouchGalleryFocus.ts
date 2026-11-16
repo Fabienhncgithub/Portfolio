@@ -13,8 +13,8 @@ import {
 } from "./constants";
 
 type TouchGalleryFocusOptions = {
-  grid: RefObject<HTMLElement>;
-  gridHeader: RefObject<HTMLDivElement>;
+  grid: RefObject<HTMLElement | null>;
+  gridHeader: RefObject<HTMLDivElement | null>;
   photos: Photo[];
   onActivePhotoChange: (photo: Photo) => void;
   onPreviewActivate: (photo: Photo) => void;
