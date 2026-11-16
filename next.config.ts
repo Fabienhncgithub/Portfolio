@@ -63,6 +63,12 @@ const nextConfig: NextConfig = {
   output: "standalone",
   outputFileTracingRoot: process.cwd(),
   poweredByHeader: false,
+  async redirects() {
+    return [
+      // The archive page was removed; keep its indexed URL from turning into a 404.
+      { source: "/archive", destination: "/", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

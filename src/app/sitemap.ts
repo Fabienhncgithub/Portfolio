@@ -4,7 +4,7 @@ import { absoluteUrl } from "@/lib/site";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const photos = await getPhotos();
-  const staticPages = ["", "/about", "/archive", "/contact"];
+  const staticPages = ["", "/about", "/contact"];
 
   return [
     ...staticPages.map((path) => ({

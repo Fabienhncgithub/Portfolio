@@ -30,7 +30,6 @@ export async function POST(request: Request) {
 
   revalidateTag("photos");
   revalidatePath("/");
-  revalidatePath("/archive");
   revalidatePath("/photo/[slug]", "page");
   revalidatePath("/sitemap.xml");
 
