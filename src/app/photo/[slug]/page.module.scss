@@ -54,7 +54,7 @@
 .photo {
   position: relative;
   width: 100%;
-  height: calc(100svh - 8rem);
+  max-height: calc(100svh - 8rem);
   background: var(--color-paper);
   aspect-ratio: var(--photo-detail-ratio);
 
@@ -137,7 +137,7 @@
   }
 
   .photo {
-    height: calc(100svh - 6rem);
+    max-height: calc(100svh - 6rem);
   }
 
   .pagination {
@@ -225,12 +225,12 @@
 
 @include bp.wide {
   .photo {
-    height: min(calc(100svh - 8rem), 1600px);
+    max-height: min(calc(100svh - 8rem), 1600px);
   }
 }
 
 @include bp.short-screen {
   .photo {
-    height: calc(100svh - 7rem);
+    max-height: calc(100svh - 7rem);
   }
 }
