@@ -9,6 +9,8 @@ export type Photo = {
   category: PhotoCategory;
   image: string;
   gridImage?: string;
+  gridImageWidth?: number;
+  gridImageHeight?: number;
   width: number;
   height: number;
   camera?: string;

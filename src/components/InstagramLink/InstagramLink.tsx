@@ -1,3 +1,5 @@
+import { instagramUrl } from "@/lib/site";
+
 export function InstagramLink({ className = "" }: { className?: string }) {
   return (
     <a
@@ -5,7 +7,7 @@ export function InstagramLink({ className = "" }: { className?: string }) {
       aria-label="Instagram"
       data-analytics-destination="instagram"
       data-analytics-event="outbound_click"
-      href="https://www.instagram.com/fabien_hnc/"
+      href={instagramUrl}
       rel="noreferrer"
       target="_blank"
     >

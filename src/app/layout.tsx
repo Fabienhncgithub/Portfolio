@@ -5,7 +5,13 @@ import {
 } from "@/components/Analytics/Analytics";
 import { PhotoCursor } from "@/components/PhotoCursor/PhotoCursor";
 import { SiteNavigation } from "@/components/SiteNavigation/SiteNavigation";
-import { absoluteUrl, siteDescription, siteName, siteUrl } from "@/lib/site";
+import {
+  absoluteUrl,
+  instagramUrl,
+  siteDescription,
+  siteName,
+  siteUrl,
+} from "@/lib/site";
 import "@/styles/base.scss";
 
 export const metadata: Metadata = {
@@ -77,6 +83,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         name: siteName,
         url: absoluteUrl(),
         jobTitle: "Photographer",
+        sameAs: [instagramUrl],
       },
     ],
   };

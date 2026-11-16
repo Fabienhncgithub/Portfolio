@@ -143,7 +143,7 @@ async function readJsonWithLimit(response: Response) {
   return JSON.parse(new TextDecoder().decode(bytes)) as unknown;
 }
 
-function normalizePhoto(entry: unknown): Photo | undefined {
+export function normalizePhoto(entry: unknown): Photo | undefined {
   const root = record(entry);
   const fields = record(root?.attributes) ?? root;
   const media = mediaAttributes(fields?.image);
@@ -173,6 +173,8 @@ function normalizePhoto(entry: unknown): Photo | undefined {
     category: photoCategory(fields.category),
     image: absoluteImageUrl,
     gridImage: absoluteGridImageUrl,
+    gridImageWidth: absoluteGridImageUrl ? positiveNumber(gridFormat?.width) : undefined,
+    gridImageHeight: absoluteGridImageUrl ? positiveNumber(gridFormat?.height) : undefined,
     width: positiveNumber(media?.width) ?? positiveNumber(fields.width) ?? 1600,
     height: positiveNumber(media?.height) ?? positiveNumber(fields.height) ?? 1200,
     camera: boundedText(fields.camera, 160),

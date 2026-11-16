@@ -5,8 +5,28 @@ import { notFound } from "next/navigation";
 import { PhotoEntrance } from "@/components/PhotoEntrance/PhotoEntrance";
 import { PhotoKeyboardNavigation } from "@/components/PhotoKeyboardNavigation/PhotoKeyboardNavigation";
 import { getPhoto, getPhotos } from "@/lib/photos";
-import { siteName } from "@/lib/site";
+import type { Photo } from "@/lib/photos";
+import { absoluteUrl, siteName } from "@/lib/site";
 import styles from "./page.module.scss";
+
+// The original upload can be a full-resolution scan, too heavy for link previews.
+function socialImage(photo: Photo) {
+  if (photo.gridImage && photo.gridImageWidth && photo.gridImageHeight) {
+    return {
+      url: photo.gridImage,
+      width: photo.gridImageWidth,
+      height: photo.gridImageHeight,
+    };
+  }
+
+  return { url: photo.image, width: photo.width, height: photo.height };
+}
+
+// The photograph is height-limited, so a portrait frame is narrower than the viewport.
+function detailSizes({ height, width }: { height: number; width: number }) {
+  const ratio = Math.round((width / height) * 1000) / 1000;
+  return `min(100vw, calc((100vh - 6rem) * ${ratio}))`;
+}
 
 export async function generateMetadata({
   params,
@@ -24,6 +44,8 @@ export async function generateMetadata({
     `photograph by ${siteName}`,
   ].filter(Boolean).join(" — ");
 
+  const image = socialImage(photo);
+
   return {
     title: photo.title,
     description,
@@ -35,18 +57,13 @@ export async function generateMetadata({
       locale: "en_GB",
       title: photo.title,
       description,
-      images: [{
-        url: photo.image,
-        width: photo.width,
-        height: photo.height,
-        alt: photo.alt,
-      }],
+      images: [{ ...image, alt: photo.alt }],
     },
     twitter: {
       card: "summary_large_image",
       title: photo.title,
       description,
-      images: [photo.image],
+      images: [image.url],
     },
   };
 }
@@ -70,11 +87,12 @@ export default async function PhotoPage({
   const previous = photos[(index - 1 + photos.length) % photos.length];
   const next = photos[(index + 1) % photos.length];
   const hasAdjacentPhotos = photos.length > 1;
-  const preloadImage = (image: string) => {
+  const sizes = detailSizes(photo);
+  const preloadImage = (image: string, adjacent: Photo) => {
     const { props } = getImageProps({
       alt: "",
       fill: true,
-      sizes: "100vw",
+      sizes: detailSizes(adjacent),
       src: image,
     });
 
@@ -89,23 +107,54 @@ export default async function PhotoPage({
     photo.year ? String(photo.year) : undefined,
   ].filter(Boolean).join(", ");
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Photograph",
+    "@id": absoluteUrl(`/photo/${photo.slug}#photograph`),
+    url: absoluteUrl(`/photo/${photo.slug}`),
+    name: photo.title,
+    description: photo.alt,
+    creator: { "@id": absoluteUrl("/#person") },
+    copyrightHolder: { "@id": absoluteUrl("/#person") },
+    ...(photo.year ? { dateCreated: String(photo.year) } : {}),
+    ...(photo.location
+      ? { contentLocation: { "@type": "Place", name: photo.location } }
+      : {}),
+    image: {
+      "@type": "ImageObject",
+      contentUrl: photo.image,
+      width: photo.width,
+      height: photo.height,
+      caption: photo.alt,
+      creator: { "@id": absoluteUrl("/#person") },
+      creditText: siteName,
+      copyrightNotice: `© ${siteName}`,
+    },
+  };
+
   return (
     <article className={styles.photoPage} data-photo-page data-photo-slug={photo.slug}>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
+        }}
+        type="application/ld+json"
+      />
       <h1 className="visually-hidden">{photo.title}</h1>
       <PhotoKeyboardNavigation
         currentSlug={photo.slug}
         previousHref={hasAdjacentPhotos ? `/photo/${previous.slug}` : undefined}
         nextHref={hasAdjacentPhotos ? `/photo/${next.slug}` : undefined}
-        previousImage={hasAdjacentPhotos ? preloadImage(previous.image) : undefined}
-        nextImage={hasAdjacentPhotos ? preloadImage(next.image) : undefined}
+        previousImage={hasAdjacentPhotos ? preloadImage(previous.image, previous) : undefined}
+        nextImage={hasAdjacentPhotos ? preloadImage(next.image, next) : undefined}
         previousPreviewImage={
           hasAdjacentPhotos && previous.gridImage
-            ? preloadImage(previous.gridImage)
+            ? preloadImage(previous.gridImage, previous)
             : undefined
         }
         nextPreviewImage={
           hasAdjacentPhotos && next.gridImage
-            ? preloadImage(next.gridImage)
+            ? preloadImage(next.gridImage, next)
             : undefined
         }
         swipeSurfaceId="photo-swipe-surface"
@@ -130,7 +179,7 @@ export default async function PhotoPage({
                 aria-hidden="true"
                 fill
                 priority
-                sizes="100vw"
+                sizes={sizes}
                 src={photo.gridImage}
               />
             ) : undefined
@@ -141,7 +190,7 @@ export default async function PhotoPage({
             alt={photo.alt}
             fill
             priority={!photo.gridImage}
-            sizes="100vw"
+            sizes={sizes}
             src={photo.image}
           />
         </PhotoEntrance>

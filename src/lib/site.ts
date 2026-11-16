@@ -17,6 +17,7 @@ resolvedSiteUrl.search = "";
 export const siteUrl = resolvedSiteUrl;
 
 export const siteName = "Fabien Hance";
+export const instagramUrl = "https://www.instagram.com/fabien_hnc/";
 export const siteDescription =
   "Landscape, architecture and quiet moments photographed by Fabien Hance.";
 
@@ -34,6 +35,13 @@ export function pageMetadata({
   title: string;
 }): Metadata {
   const socialTitle = `${title} — ${siteName}`;
+  // A page-level openGraph object replaces the root one, including its generated image.
+  const socialImage = {
+    url: "/opengraph-image",
+    width: 1200,
+    height: 630,
+    alt: `${siteName} — Photographer`,
+  };
 
   return {
     title,
@@ -46,11 +54,13 @@ export function pageMetadata({
       locale: "en_GB",
       title: socialTitle,
       description,
+      images: [socialImage],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title: socialTitle,
       description,
+      images: [socialImage],
     },
   };
 }
