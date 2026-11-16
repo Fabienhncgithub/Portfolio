@@ -81,6 +81,9 @@ const nextConfig: NextConfig = {
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     formats: ["image/avif", "image/webp"],
+    // Strapi upload names carry a content hash, so an optimized image never goes stale.
+    // The 60-second default made every visit re-encode the photographs in the background.
+    minimumCacheTTL: 31_536_000,
     remotePatterns: [
       {
         protocol: "https",
