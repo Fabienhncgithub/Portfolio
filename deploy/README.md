@@ -56,6 +56,27 @@ The `Uptime` workflow checks the public sites every 30 minutes and fails when on
 unreachable or its certificate expires within 14 days. GitHub emails scheduled workflow
 failures to the last person who edited the schedule.
 
+GitHub disables scheduled workflows after 60 days without repository activity and announces
+it by email; re-enable `Uptime` from the Actions tab if that happens.
+
+## Backups
+
+`backup-production.sh` runs before every production deploy. It dumps PostgreSQL, archives the
+Strapi uploads into `/var/backups/photography-portfolio` and removes local files older than
+30 days. To also keep a copy off the server, install [rclone](https://rclone.org), configure a
+remote for the deploying user and export `PORTFOLIO_BACKUP_REMOTE` (for example
+`b2:my-bucket/portfolio`) in that user's shell profile. The script then uploads each new
+backup and stops the deploy if the upload fails. Without the variable it prints a warning and
+keeps local copies only.
+
+Deploys can be weeks apart, so schedule the script as well, for example daily from the
+deploying user's crontab:
+
+```cron
+PORTFOLIO_BACKUP_REMOTE=b2:my-bucket/portfolio
+30 3 * * * /path/to/production-checkout/deploy/backup-production.sh
+```
+
 ## Releases
 
 Release Please runs after validated changes reach `master`. Configure a fine-grained token as
